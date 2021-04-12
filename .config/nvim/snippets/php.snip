@@ -1,0 +1,186 @@
+include xhtml.snip
+
+snippet php
+options word
+  <?php
+  ${0}
+  ?>
+
+snippet this
+  $this->${0}
+
+snippet c
+  /**
+   * $0
+   */
+
+snippet class
+  class ${1:class_name}
+  {
+    ${0}
+  }
+
+snippet function
+  ${1:public }function ${2:function_name}(${3})
+  {
+    ${0}
+  }
+
+snippet con
+  function __construct(${1})
+  {
+    ${0}
+  }
+
+snippet def
+  ${1}defined('${2}')${3}
+
+snippet if
+  if (${1:condition}) {
+    ${0}
+  }
+
+snippet else
+  else {
+    ${0}
+  }
+
+snippet ifelse
+  if (${1:condition}) {
+    ${2}
+  } else {
+    ${3}
+  }
+
+snippet elseif
+  elseif (${1:condition}) {
+    ${0}
+  }
+
+snippet for
+  for ($${1:i}=${2}; $${1:i} < ${3}; $${1:i}++) {
+    ${0}
+  }
+
+snippet fore
+  foreach ($${1} as $${2}${3: =>} $${4}) {
+    ${0}
+  }
+
+snippet while
+  while (${1}) {
+    ${0}
+  }
+
+snippet switch
+  switch (${1}) {
+  case '${2}':
+    ${3}
+    break;
+  ${0}
+  default:
+    ${4}
+    break;
+  }
+
+snippet case
+  case '${1}':
+    ${2}
+    break;
+
+snippet do
+  do {
+    ${0}
+  } while (${1});
+
+snippet if?
+  $${1} = (${2}) ? ${3} : ${4} ;${5}
+
+snippet here
+  <<<${1:EOF}
+  ${2}
+  $1;
+
+snippet array
+  $${1} = array('${2}' => ${3} ${4});
+
+snippet throw
+  throw new ${1}Exception(${2:"${3:Error Processing Request}"}${4:});
+  ${5}
+
+snippet echo
+  echo "${1}"${2};
+
+snippet inc
+  include '${1}';${2}
+
+snippet inco
+  include_once '${1}';${2}
+
+snippet req
+  require '${1}';${2}
+
+snippet reqo
+  require_once '${1}';${2}
+
+snippet ret
+  return${1};${2}
+
+snippet retf
+  return false;
+
+snippet rett
+  return true;
+
+snippet gloabals
+  \$GLOBALS['${1}']${2: = }${3}${4:;}${5}
+
+snippet cookie
+  \$_COOKIE['${1}']
+
+snippet env
+  \$_ENV['${1}']
+
+snippet files
+  \$_FILES['${1}']
+
+snippet get
+  \$_GET['${1}']
+
+snippet post
+  \$_POST['${1}']
+
+snippet request
+  \$_REQUEST['${1}']
+
+snippet server
+  \$_SERVER['${1}']
+
+snippet session
+  \$_SESSION['${1}']
+
+snippet pecho
+  <?php echo ${1} ?>${2}
+
+snippet echoh
+  <?php echo htmlentities(${1}, ENT_QUOTES, 'utf-8') ?>${2}
+
+snippet pfore
+  <?$php foreach ($${1} as $${2}${3: =>}): ?>
+  ${0}
+  <?php endforeach ?>
+
+snippet pife
+  <?php if (${1:condition}): ?>
+  ${2}
+  <?php else: ?>
+  ${3}
+  <?php endif ?>
+
+snippet pif
+  <?php if (${1:condition}): ?>
+  ${0}
+  <?php endif ?>
+
+snippet pelse
+  <?php else: ?>

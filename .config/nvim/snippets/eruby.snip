@@ -1,0 +1,95 @@
+include xhtml.snip
+
+snippet =
+options word
+  <%= ${0} %>
+
+snippet -
+options word
+  <% ${0} %>
+
+snippet c
+options word
+  <%# ${0} %>
+
+snippet each
+options word
+  <% ${1:collection}.each do |${2:member}| %>
+    ${0}
+  <% end %>
+
+snippet if
+options word
+  <% if ${1:condition} %>
+    ${0}
+  <% end %>
+
+snippet unless
+options word
+  <% unless ${1:condition} %>
+    ${0}
+  <% end %>
+
+snippet ife
+options word
+  <% if ${1:condition} %>
+    ${2}
+  <% else %>
+    ${3}
+  <% end %>
+
+snippet yield
+options word
+  <%= yield :${0} %>
+
+snippet lt
+options word
+  <%= link_to ${1}, ${2:path} %>
+
+snippet imgt
+options word
+  <%= image_tag("${0}") %>
+
+snippet contf
+options word
+  <% content_for :${1} do %>
+    ${0}
+  <% end %>
+
+snippet ff
+options word
+  <%= form_for(${1}) do |f| %>
+    ${0}
+  <% end %>
+
+snippet ffff
+options word
+  <%= f.file_field :${0} %>
+
+snippet ffhf
+options word
+  <%= f.hidden_field :${0} %>
+
+snippet ffl
+options word
+  <%= f.label :${1}, '${2}' %>
+
+snippet ffpf
+options word
+  <%= f.password_field :${0} %>
+
+snippet ffrb
+options word
+  <%= f.radio_button :${1}, :${2} %>
+
+snippet ffs
+options word
+  <%= f.submit "${0}" %>
+
+snippet ffta
+options word
+  <%= f.text_area :${0} %>
+
+snippet fftf
+options word
+  <%= f.text_field :${0} %>

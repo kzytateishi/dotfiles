@@ -1,0 +1,48 @@
+snippet t
+  t('${1}')
+
+snippet lt
+  link_to ${1:name}, ${2:url}
+
+snippet content_for
+  - content_for :${1:name} do
+
+snippet img
+  image_tag ${1:source}, ${2:options}
+
+snippet ff
+  = form_for ${1:object}, url: ${2:url}, html: { class: '${3:class}' } do |f|
+
+snippet file
+  file_field ${1:method}, ${2:options}
+snippet text
+  text_field ${1:object_name}, ${2:method}, ${3:options}
+snippet area
+  text_area ${1:object_name}, ${2:method}, ${3:options}
+snippet select
+  select ${1:method}, ${2:choices}, ${3:options}, ${4:html_options}
+snippet check
+  check_box ${1:method}, ${2:options}, ${3:checked_value}, ${4:unchecked_value}
+snippet radio
+  radio_button ${1:method}, ${2:tag_value}, ${3:options}
+snippet label
+  label ${1:method}
+snippet submit
+  submit ${1:value}
+
+snippet file_t
+  file_field_tag ${1:name}, ${2:options}
+snippet text_t
+  text_field_tag ${1:name}, ${2:value}, ${3:options}
+snippet area_t
+  text_area_tag ${1:name}, ${2:content}, ${3:options}
+snippet select_t
+  select_tag ${1:name}, ${2:option_tags}, ${3:options}
+snippet check_t
+  check_box_tag ${1:name}, ${2:value}, ${3:checked}, ${4:options}
+snippet radio_t
+  radio_button_tag ${1:name}, ${2:value}, ${3:checked}, ${4:options}
+snippet label_t
+  label_tag ${1:name}
+snippet submit_t
+  submit_tag ${1:value}

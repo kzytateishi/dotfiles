@@ -1,0 +1,47 @@
+[core]
+	editor = nvim
+	precomposeunicode = true
+	quotepath = true
+[color]
+	ui = auto
+	status = auto
+	diff = auto
+	branch = auto
+	interactive = auto
+	grep = auto
+[diff]
+	patience = true
+	renames = true
+	compactionHeuristic = true
+[alias]
+	st = status
+	ci = commit
+	co = checkout
+	br = branch
+	cp = cherry-pick
+	lg = log --graph --all --decorate --abbrev-commit --branches --date=short --pretty=format:\"%C(red)%h%C(reset) %C(green)[%ad]%C(reset) %s %C(cyan)@%an%C(reset) %C(yellow)%d%C(reset)\"
+	tags = tag -l
+	graph = git log --graph --decorate --oneline
+
+	dm = diff master
+	dc = diff --cached         # addされているものとのdiff
+	d1 = diff HEAD~            # HEADから1つ前とdiff
+	d2 = diff HEAD~~           # HEADから2つ前とdiff
+	difff = diff --word-diff
+
+	r   = reset
+	r1  = reset HEAD^
+	r2  = reset HEAD^^
+	rh  = reset --hard
+	rh1 = reset HEAD^ --hard
+	rh2 = reset HEAD^^ --hard
+
+	p = !git push origin git rev-parse --abbrev-ref HEAD
+
+	clear = "!f () { git checkout $1; git branch --merged|egrep -v '\\*|develop|master'|xargs git branch -d; };f"
+[include]
+	path = ~/.gitconfig.local
+[pull]
+	rebase = true
+[rebase]
+	autostash = true

@@ -1,0 +1,7 @@
+percol
+pynvim
+powerline-status
+powerline-mem-segment
+psutil
+pip-review
+tqdm

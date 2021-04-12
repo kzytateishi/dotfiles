@@ -1,0 +1,156 @@
+[[plugins]]
+repo = 'Shougo/dein.vim'
+
+# linters
+[[plugins]]
+repo = 'dense-analysis/ale'
+hook_add = '''
+  let g:ale_set_highlights = 0
+  let g:ale_lint_on_enter=1
+  let g:ale_lint_on_save=1
+  let g:ale_lint_on_text_changed=0
+  let g:ale_sign_column_always=1
+  let g:ale_linters = {
+    \ 'css': ['stylelint', 'prettier'],
+    \ 'erb': ['erb'],
+    \ 'graphql': ['eslint'],
+    \ 'javascript': ['eslint'],
+    \ 'json': ['jq'],
+    \ 'python': ['pylint'],
+    \ 'ruby': ['rubocop'],
+    \ 'rust': ['cargo', 'rustfmt'],
+    \ 'sass': ['sass-lint'],
+    \ 'scss': ['sass-lint'],
+    \ 'typescript': ['eslint']
+    \ }
+  let g:ale_sign_error='E'
+  let g:ale_sign_warning='W'
+  let g:ale_echo_msg_error_str='E'
+  let g:ale_echo_msg_warning_str='W'
+  let g:ale_echo_msg_format='[%linter%] %s (%severity%)'
+  let g:ale_statusline_format=['E %d', 'W %d', '']
+  let g:ale_open_list=1
+  let g:ale_set_loclist=0
+  let g:ale_set_quickfix=0 " NOT use QuickFix
+  let g:ale_keep_list_window_open=0
+  let g:ale_javascript_prettier_use_local_config=1
+  let g:ale_go_langserver_executable = 'gopls'
+  let g:ale_ruby_rubocop_executable = 'bundle'
+'''
+
+# fzf
+[[plugins]]
+repo = 'junegunn/fzf'
+hook_post_update = './install --all'
+merged = 0
+
+# fzf.vim
+[[plugins]]
+repo = 'junegunn/fzf.vim'
+depends = 'fzf'
+hook_add = '''
+    command! -bang -nargs=* Rg
+    \ call fzf#vim#grep(
+    \ 'rg --column --line-number --hidden --ignore-case --no-heading --color=always '.shellescape(<q-args>), 1,
+    \ <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
+    \ : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%:hidden', '?'),
+    \ <bang>0)
+    nnoremap <C-g> :Rg<Space>
+    nnoremap <C-p> :GFiles<CR>
+    nnoremap <C-f> :History<CR>
+'''
+
+[[plugins]]
+repo = 'Shougo/vimproc.vim'
+build = 'make'
+
+
+[[plugins]]
+repo = 'elzr/vim-json'
+hook_add = '''
+source ~/.config/nvim/plugins/vim-json.rc.vim
+'''
+
+[[plugins]]
+repo = 'maxmellon/vim-jsx-pretty'
+
+[[plugins]]
+repo = 'Shougo/neosnippet'
+hook_add = '''
+source ~/.config/nvim/plugins/neosnippet.rc.vim
+'''
+
+[[plugins]]
+repo = 'Shougo/neosnippet-snippets'
+
+[[plugins]]
+repo = 'Shougo/unite.vim' # for Shougo/vimfiler
+
+[[plugins]]
+repo = 'Shougo/vimfiler'
+hook_add = '''
+source ~/.config/nvim/plugins/vimfiler.rc.vim
+'''
+
+[[plugins]]
+repo = 'simeji/winresizer'
+
+[[plugins]]
+repo = 'slim-template/vim-slim'
+
+[[plugins]]
+repo = 'tpope/vim-fugitive'
+
+[[plugins]]
+repo = 'tpope/vim-abolish'
+
+[[plugins]]
+repo = 'vim-airline/vim-airline'
+depends = ['vim-airline-themes']
+hook_add = '''
+source ~/.config/nvim/plugins/vim-airline.rc.vim
+'''
+
+[[plugins]]
+repo = 'vim-airline/vim-airline-themes'
+
+[[plugins]]
+repo = 'vim-scripts/Align'
+
+[[plugins]]
+repo = 'vim-scripts/AnsiEsc.vim'
+
+#[[plugins]]
+#repo = 'w0rp/ale'
+
+# for Ruby
+[[plugins]]
+repo = 'vim-ruby/vim-ruby'
+
+[[plugins]]
+repo = 'tpope/vim-rails'
+# / for Ruby
+
+# for Go
+[[plugins]]
+repo = 'fatih/vim-go'
+# / for Go
+
+# for Syntax
+[[plugins]]
+repo = 'hail2u/vim-css3-syntax'
+
+[[plugins]]
+repo = 'kchmck/vim-coffee-script'
+
+[[plugins]]
+repo = 'posva/vim-vue'
+# / for Syntax
+
+# color schema
+[[plugins]]
+repo = 'tomasr/molokai'
+
+[[plugins]]
+repo = 'jacoborus/tender.vim'
+# / color schema

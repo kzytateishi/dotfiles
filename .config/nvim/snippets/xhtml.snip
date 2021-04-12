@@ -1,0 +1,176 @@
+snippet doctypetransitional
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+snippet doctypeframeset
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+
+snippet doctypestrict
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+snippet xhtml
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+        ${1}
+    </html>
+
+snippet head
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <title>${1}</title>
+    </head>
+
+snippet style
+    <style type="text/css">
+    ${1}
+    </style>
+
+snippet script
+    <script type="text/javascript">
+    ${1}
+    </script>
+
+snippet stylef
+    <link rel="stylesheet" type="text/css" href="stylesheets/${1:css_filename}.css" />
+
+snippet scriptf
+    <script src="./javascripts/${1:js_filename}.js" type="text/javascript" charset="utf-8"></script>
+
+snippet body
+    <body>
+       ${1}
+    </body>
+
+snippet h
+    <h${1:1}>${2}</h$1>
+
+snippet div
+    <div>${1}</div>$
+
+snippet divclass
+    <div class="${1}">${2}</div>
+
+snippet divid
+    <div id="${1}">${2}</div>
+
+snippet p
+    <p>${1}</p>
+
+snippet pclass
+    <p class="${1}">${2}</p>
+
+snippet pid
+    <p id="${1}">${2}</p>
+
+snippet br
+    <br />
+
+snippet hr
+    <hr />
+
+snippet comment
+    <!--${1}-->
+
+snippet ahref
+    <a href="${1}">${2}</a>
+
+snippet table
+    <table>
+      <thead>
+      ${0}
+      </thead>
+      <tbody>
+      ${1}
+      </tbody>
+    </table>
+
+snippet thead
+    <thead>
+    ${0}
+    </thead>
+
+snippet tbody
+    <tbody>
+    ${0}
+    </tbody>
+
+snippet tfoot
+    <tfoot>
+    ${0}
+    </tfoot>
+
+snippet tr
+    <tr>${0}</tr>
+
+snippet th
+    <th>${1}</th>
+
+snippet td
+    <td>${1}</td>
+
+snippet ul
+    <ul>${0}</ul>
+
+snippet ol
+    <ol>${0}</ol>
+
+snippet li
+    <li>${0}</li>
+
+snippet dl
+    <dl>${0}</dl>
+
+snippet dt
+    <dt>${0}</dt>
+
+snippet dd
+    <dd>${0}</dd>
+
+snippet form
+    <form>
+    ${0}
+    </form>
+
+snippet inputtext
+    <input type="text" name="${1}">
+
+snippet inputpassword
+    <input type="password" name="${1}">
+
+snippet inputradio
+    <input type="radio" name="${1}" value="value">
+
+snippet inputcheckbox
+    <input type="checkbox" name="${1}">
+
+snippet textarea
+    <textarea>
+    ${1}
+    </textarea>
+
+snippet button
+    <button>${1}</button>
+
+snippet select
+    <select>${1}</select>
+
+snippet option
+    <option value="${1}">${2}</option>
+
+snippet img
+    <img src="${1}">
+
+snippet html
+  <html>
+  <head>
+  <meta charset="UTF-8">
+  <title>Demo</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+  <script src="js/test.js"></script>
+  <link href="css/test.css" media="all" rel="stylesheet">
+  </head>
+  <body>
+  <h1>Demo</h1>
+  </body>
+  </html>

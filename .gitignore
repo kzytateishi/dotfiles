@@ -1,0 +1,16 @@
+*.diff
+*.swp
+.DS_Store
+.zcompdump
+.svn
+
+.gitconfig.local
+.vimrc.project
+
+.rbenv-gemsets
+.pryrc
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

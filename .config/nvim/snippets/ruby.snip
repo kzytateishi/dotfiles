@@ -1,0 +1,215 @@
+snippet s
+  #{${1}}${0}
+
+snippet class
+  class ${1}
+    ${0}
+  end
+
+snippet def
+  def ${1}
+    ${0}
+  end
+
+snippet inject
+abbr inject(n) do end
+  inject(${1:initial}) { |${2}, ${3}| ${4:block} }
+
+snippet begin
+abbr begin rescue end
+  begin
+    ${1}
+  rescue
+    ${2}
+  end
+
+snippet each
+  ${1:collection}.each do |${2:member}|
+    ${0}
+  end
+
+snippet if
+  if ${1:condition}
+    ${0}
+  end
+
+snippet ife
+  if ${1:condition}
+    ${2}
+  else
+    ${3}
+  end
+
+snippet unless
+  unless ${1:condition}
+    ${0}
+  end
+
+snippet while
+  while ${1:condition}
+    ${0}
+  end
+
+snippet case
+  case ${1}
+  when ${2}
+    ${3}
+  end
+
+snippet transaction
+  ActiveRecord::Base.transaction do
+  end
+
+snippet btransaction
+  begin
+    ActiveRecord::Base.transaction do
+    end
+  rescue => e
+  end
+
+# japanese match
+snippet     match_japanese
+abbr        match_japanese
+options     word
+  /[ぁ-んァ-ヴ一-龠亜-煕]/u
+
+# / Ruby
+
+# Rails
+
+snippet scope
+  scope ${1:name}, -> (${2:args}) do
+    ${3:condition}
+  end
+
+snippet vp
+  validates :${1:column}, presence: true
+
+snippet vn
+  validates :${1:column}, numericality: true
+
+snippet vn2
+  validates :${1:column}, numericality: { allow_blank: true, only_integer: true }
+
+snippet vu
+  validates :${1:column}, uniqueness: true
+
+snippet vl
+  validates :${1:column}, length: { maximum: ${2:size} }
+
+snippet vl2
+  validates :${1:column}, length: { within: ${2:start}..${3:end} }
+
+snippet vi
+  validates :${1:column}, inclusion: { in: ${2:range} }
+
+snippet vf
+  validates :${1:column}, format: { with: ${2:format} }
+
+snippet     concern
+abbr        extend ActiveSupport::Concern
+options     word
+  extend ActiveSupport::Concern
+
+# / Rails
+
+# gem
+snippet     binding
+abbr        binding
+alias       pry
+options     word
+  binding.pry
+# / gem
+
+# RSpec
+snippet desc
+abbr    describe end
+prev_word '^'
+    describe '${1:name}' do
+        ${2}
+    end
+
+snippet context
+  context '${1}' do
+    ${2}
+  end
+
+snippet before
+  before do
+    ${0}
+  end
+
+snippet it
+  it '${1}' do
+    ${0}
+  end
+
+snippet subject
+  subject { ${0} }
+
+snippet be_t
+  be_truthy
+
+snippet be_f
+  be_falsy
+
+snippet change
+  expect { subject }.to change(${2:described_class}, :count).by(${3:1})
+
+snippet sc
+  shared_context '${1:condition}' do
+    ${4}
+  end
+
+snippet sci
+  include_context '${1}'
+
+snippet se
+  shared_examples '${1:do something}' do
+      ${2}
+  end
+
+snippet sei
+  it_behaves_like '${1}'
+
+snippet stub
+  allow(${1}).to receive(:${2}).and_return(${3})
+
+snippet mock
+  expect(${1}).to receive(:${2}).and_return(${3})
+
+snippet astub
+  allow_any_instance_of(${1}).to receive(:${2}).and_return(${3})
+
+snippet amock
+  expect_any_instance_of(${1}).to receive(:${2}).and_return(${3})
+# / RSpec
+
+# FactoryBot
+snippet fgb
+  FactoryBot.build(:${1})
+
+snippet fgs
+  FactoryBot.build_stubbed(:${1})
+
+snippet fgc
+  FactoryBot.create(:${1})
+
+snippet fga
+  FactoryBot.attributes_for(:${1})
+
+snippet fgseq
+  sequence(:${1}) {|n| '${2}#{n}'}
+
+snippet fgbl
+  let(:${1:model}) { FactoryBot.build(:${2}) }
+
+snippet fgsl
+  let(:${1:model}) { FactoryBot.build_stubbed(:${2}) }
+
+snippet fgcl
+  let(:${1:model}) { FactoryBot.create(:${2}) }
+
+snippet fgal
+  let(:${1:model}) { FactoryBot.attributes_for(:${2}) }
+# / FactoryBot
