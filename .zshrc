@@ -67,6 +67,7 @@ export ANDROID_AVD_HOME=$HOME/.android/avd
 
 # Flutter
 export FLUTTER_ROOT="$(asdf where flutter)"
+export PATH="$PATH":"$HOME/.pub-cache/bin"
 
 # asdf
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
