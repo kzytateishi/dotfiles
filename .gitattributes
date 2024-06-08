@@ -1,19 +1,9 @@
-*.c diff=cpp
-*.h diff=cpp
-*.cpp diff=cpp
-*.hpp diff=cpp
-*.cs diff=csharp
-*.m diff=objc
-*.java diff=java
-*.html diff=html
-*.xml diff=html
-*.pl diff=perl
-*.pm diff=perl
-*.t diff=perl
-*.php diff=php
-*.ptml diff=php
-*.py diff=python
-*.rb diff=ruby
-*.js diff=java
-*.csv encoding=cp932
-*.json diff=json
+# See https://git-scm.com/docs/gitattributes for more about git attribute files.
+
+# Mark the database schema as having been generated.
+db/schema.rb linguist-generated
+
+# Mark any vendored files as having been vendored.
+vendor/* linguist-vendored
+config/credentials/*.yml.enc diff=rails_credentials
+config/credentials.yml.enc diff=rails_credentials

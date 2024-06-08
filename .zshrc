@@ -39,6 +39,8 @@ setopt hist_ignore_all_dups
 
 export LANG=ja_JP.UTF-8
 
+export JAVA_HOME=`/usr/libexec/java_home -v 21`
+
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 eval "$(starship init zsh)"
@@ -70,7 +72,10 @@ export FLUTTER_ROOT="$(asdf where flutter)"
 export PATH="$PATH":"$HOME/.pub-cache/bin"
 
 # asdf
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
+#. /opt/homebrew/opt/asdf/libexec/asdf.sh
+
+# mise
+eval "$(/opt/homebrew/bin/mise activate zsh)"
 
 # direnv
 eval "$(direnv hook zsh)"

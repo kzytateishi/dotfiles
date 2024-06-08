@@ -1,0 +1,6 @@
+[tools]
+node = "22.2.0"
+go = ['1.21', '1.18']
+ruby = "3.3.0"
+flutter = "latest"
+python = "3.12"
