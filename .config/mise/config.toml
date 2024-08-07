@@ -1,6 +1,7 @@
 [tools]
-node = "22.2.0"
-go = ['1.21', '1.18']
-ruby = "3.3.0"
+node = "latest"
+go = "latest"
+ruby = "latest"
 flutter = "latest"
-python = "3.12"
+python = "latest"
+pnpm = "9.6.0"
