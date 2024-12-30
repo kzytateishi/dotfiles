@@ -121,3 +121,15 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+
+function select-task () {
+  task_name=$(task -a --json | jq -r '.tasks[].name' | peco)
+  if [ -n "$task_name" ]; then
+    BUFFER="task $task_name"
+    CURSOR=$#BUFFER
+    zle reset-prompt
+  fi
+}
+zle -N select-task
+bindkey '^T' select-task
