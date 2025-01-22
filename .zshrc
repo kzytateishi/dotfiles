@@ -67,10 +67,6 @@ export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export ANDROID_AVD_HOME=$HOME/.android/avd
 
-# Flutter
-export FLUTTER_ROOT="$(asdf where flutter)"
-export PATH="$PATH":"$HOME/.pub-cache/bin"
-
 # asdf
 #. /opt/homebrew/opt/asdf/libexec/asdf.sh
 
@@ -114,15 +110,6 @@ hash tmux 2>/dev/null && source "$HOME/.tmux.zsh"
 
 export SHELL="/opt/homebrew/bin/zsh"
 
-# pnpm
-export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
-
-
 function select-task () {
   task_name=$(task -a --json | jq -r '.tasks[].name' | peco)
   if [ -n "$task_name" ]; then
@@ -133,3 +120,13 @@ function select-task () {
 }
 zle -N select-task
 bindkey '^T' select-task
+
+export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="/Users/kazuya/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

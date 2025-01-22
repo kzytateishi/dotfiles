@@ -38,6 +38,8 @@
 
 	p = !git push origin git rev-parse --abbrev-ref HEAD
 
+	cop = !"git branch --all | tr -d '* ' | grep -v -e '->' | peco | sed -e 's+remotes/[^/]*/++g' | xargs git checkout"
+
 	clear = "!f () { git checkout $1; git branch --merged|egrep -v '\\*|develop|master'|xargs git branch -d; };f"
 [include]
 	path = ~/.gitconfig.local

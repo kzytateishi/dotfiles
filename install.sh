@@ -40,7 +40,7 @@ function sync() {
 
   syncFile ".config/nvim/init.vim"
   syncFile ".config/nvim/dein.toml"
-  syncFile ".config/nvim/deinlazy.toml"
+  syncFile ".config/nvim/dein_lazy.toml"
   syncFile ".config/nvim/ftplugin"
   syncFile ".config/nvim/plugins"
   syncFile ".config/nvim/rc"
