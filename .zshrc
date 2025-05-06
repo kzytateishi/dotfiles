@@ -71,7 +71,8 @@ export ANDROID_AVD_HOME=$HOME/.android/avd
 #. /opt/homebrew/opt/asdf/libexec/asdf.sh
 
 # mise
-eval "$(/opt/homebrew/bin/mise activate zsh)"
+export PATH="/Users/kazuya/.local/share/mise/shims:$PATH"
+eval "$(mise activate zsh)"
 
 # direnv
 eval "$(direnv hook zsh)"
@@ -130,3 +131,8 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/emulator
