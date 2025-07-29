@@ -4,3 +4,5 @@ set vertical-split = no
 set diff-context = 6
 
 set line-graphics = utf-8
+
+set diff-highlight = true
