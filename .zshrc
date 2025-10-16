@@ -1,4 +1,3 @@
-
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
     print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
@@ -150,3 +149,12 @@ lg()
             rm -f $LAZYGIT_NEW_DIR_FILE > /dev/null
     fi
 }
+export PATH="$HOME/.local/bin:$PATH"
+
+# Flutter/Dart (via mise)
+export PATH="$HOME/.local/share/mise/installs/flutter/3.29.3-stable/bin:$PATH"
+export PATH="$HOME/.local/share/mise/installs/flutter/3.29.3-stable/bin/cache/dart-sdk/bin:$PATH"
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/kazuya/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
