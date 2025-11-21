@@ -29,12 +29,30 @@ zinit light zdharma/fast-syntax-highlighting
 zinit light paulirish/git-open
 ### End of Zinit's Custom Settings
 
-HISTFILE=~/.zsh_history
-STSIZE=100000
-SAVEHIST=100000
-setopt share_history
-setopt hist_reduce_blanks
-setopt hist_ignore_all_dups
+# History settings
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=100000
+export SAVEHIST=100000
+
+setopt share_history         # 同じ HISTFILE を使うシェル間で履歴共有
+setopt hist_reduce_blanks    # 余計なスペースを削る
+setopt hist_ignore_all_dups  # 同じコマンドは最新だけ残す
+setopt append_history        # 終了時に履歴を追記
+setopt inc_append_history    # コマンド実行ごとに即時保存
+
+# tmux セッションごとに履歴ファイルを分割
+if [[ -n "$TMUX" ]]; then
+  # セッション名（例: styler, infra など）
+  session_name="$(tmux display-message -p '#S' 2>/dev/null)"
+
+  if [[ -n "$session_name" ]]; then
+    hist_dir="$HOME/.zsh_hist_tmux"
+    mkdir -p "$hist_dir"
+
+    # 例: ~/.zsh_hist_tmux/styler.history
+    export HISTFILE="$hist_dir/${session_name}.history"
+  fi
+fi
 
 export LANG=ja_JP.UTF-8
 
