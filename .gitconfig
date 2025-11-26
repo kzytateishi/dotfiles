@@ -1,54 +1,100 @@
 [core]
-	editor = nvim
-	precomposeunicode = true
-	quotepath = true
+  editor = nvim
+  precomposeunicode = true
+  quotepath = false
+
 [color]
-	ui = auto
-	status = auto
-	diff = auto
-	branch = auto
-	interactive = auto
-	grep = auto
+  ui = auto
+  status = auto
+  diff = auto
+  branch = auto
+  interactive = auto
+  grep = auto
+
 [diff]
-	patience = true
-	renames = true
-	compactionHeuristic = true
+  patience = true
+  renames = true
+  compactionHeuristic = true
+  colorMoved = default
+
+[merge]
+  conflictstyle = zdiff3
+  ff = false
+
+[init]
+  defaultBranch = main
+
+[fetch]
+  prune = true
+
 [alias]
-	st = status
-	ci = commit
-	co = checkout
-	br = branch
-	cp = cherry-pick
-	lg = log --graph --all --decorate --abbrev-commit --branches --date=short --pretty=format:\"%C(red)%h%C(reset) %C(green)[%ad]%C(reset) %s %C(cyan)@%an%C(reset) %C(yellow)%d%C(reset)\"
-	tags = tag -l
-	graph = git log --graph --decorate --oneline
+  st  = status
+  ss  = status -sb
 
-	dm = diff master
-	dc = diff --cached         # addされているものとのdiff
-	d1 = diff HEAD~            # HEADから1つ前とdiff
-	d2 = diff HEAD~~           # HEADから2つ前とdiff
-	difff = diff --word-diff
+  ci  = commit
+  co  = checkout
+  cob = checkout -b
+  br  = branch
+  cp  = cherry-pick
 
-	r   = reset
-	r1  = reset HEAD^
-	r2  = reset HEAD^^
-	rh  = reset --hard
-	rh1 = reset HEAD^ --hard
-	rh2 = reset HEAD^^ --hard
+  lg = log --graph --all --decorate --abbrev-commit --branches --date=short --pretty=format:'%C(red)%h%C(reset) %C(green)[%ad]%C(reset) %s %C(cyan)@%an%C(reset) %C(yellow)%d%C(reset)'
+  tags  = tag -l
+  graph = log --graph --decorate --oneline
 
-	p = !git push origin git rev-parse --abbrev-ref HEAD
+  dm   = diff @{upstream}
+  dc   = diff --cached         # add 済みとの diff
+  d1   = diff HEAD~            # 1つ前との diff
+  d2   = diff HEAD~~           # 2つ前との diff
+  difff = diff --word-diff
 
-	cop = !"git branch --all | tr -d '* ' | grep -v -e '->' | peco | sed -e 's+remotes/[^/]*/++g' | xargs git checkout"
+  r   = reset
+  r1  = reset HEAD^
+  r2  = reset HEAD^^
+  rh  = reset --hard
+  rh1 = reset HEAD^ --hard
+  rh2 = reset HEAD^^ --hard
 
-	clear = "!f () { git checkout $1; git branch --merged|egrep -v '\\*|develop|master'|xargs git branch -d; };f"
+  p = "!git push -u origin \"$(git symbolic-ref --short HEAD)\""
+
+  cop = "!git for-each-ref --format='%(refname:short)' | peco | xargs git checkout"
+
+  clear = "!f() { \
+    target=\"${1:-$(git symbolic-ref --short HEAD)}\"; \
+    git checkout \"$target\"; \
+    git branch --merged \"$target\" \
+    | grep -vE \"^(\\*|\\s*(master|main|develop)$)\" \
+    | xargs -r git branch -d; \
+    }; f"
+
 [include]
-	path = ~/.gitconfig.local
+  path = ~/.gitconfig.local
+
 [pull]
-	rebase = true
+  rebase = true
+  ff = only
+
 [rebase]
-	autostash = true
+  autostash = true
+
 [filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-	required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+
+[push]
+  default = simple
+
+[pager]
+  diff = delta
+  log = delta
+  reflog = delta
+  show = delta
+
+[interactive]
+  # git add -p などでも delta を使う
+  diffFilter = delta --color-only
+
+[delta]
+  navigate = true
+  line-numbers = true
