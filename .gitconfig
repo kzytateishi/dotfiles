@@ -96,5 +96,17 @@
   diffFilter = delta --color-only
 
 [delta]
+  true-color = always
+  dark = true
   navigate = true
   line-numbers = true
+  side-by-side = true
+  wrap = character
+  syntax-theme = OneHalfDark
+  keep-plus-minus-markers = true
+  zero-style = syntax
+  plus-style  = syntax
+  minus-style = syntax
+  plus-emph-style  = "bold #27a96a #11271c"
+  minus-emph-style = "bold #ff6b6b #311717"
+  whitespace-error-style = normal
