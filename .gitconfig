@@ -86,14 +86,14 @@
   default = simple
 
 [pager]
-  diff = delta
-  log = delta
-  reflog = delta
-  show = delta
+#  diff = delta
+#  log = delta
+#  reflog = delta
+#  show = delta
 
 [interactive]
   # git add -p などでも delta を使う
-  diffFilter = delta --color-only
+#  diffFilter = delta --color-only
 
 [delta]
   true-color = always

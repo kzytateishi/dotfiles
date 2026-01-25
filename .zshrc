@@ -169,10 +169,4 @@ lg()
 }
 export PATH="$HOME/.local/bin:$PATH"
 
-# Flutter/Dart (via mise)
-export PATH="$HOME/.local/share/mise/installs/flutter/3.29.3-stable/bin:$PATH"
-export PATH="$HOME/.local/share/mise/installs/flutter/3.29.3-stable/bin/cache/dart-sdk/bin:$PATH"
-
-### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export PATH="/Users/kazuya/.rd/bin:$PATH"
-### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
+export PATH=/Users/kazuya/.ticloud/bin:$PATH
