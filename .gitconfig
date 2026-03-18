@@ -1,0 +1,110 @@
+[core]
+  editor = nvim
+  precomposeunicode = true
+  quotepath = false
+
+
+[color]
+  ui = auto
+
+[init]
+  defaultBranch = main
+
+[diff]
+  renames = true
+  colorMoved = default
+  algorithm = histogram
+
+[merge]
+  conflictstyle = zdiff3
+  ff = false
+
+[pull]
+  rebase = true
+
+[push]
+  default = current
+  autoSetupRemote = true
+
+[fetch]
+  prune = true
+  pruneTags = true
+
+[rebase]
+  autostash = true
+  autosquash = true
+
+[rerere]
+  enabled = true
+
+[branch]
+  sort = -committerdate
+
+[tag]
+  sort = -version:refname
+
+[alias]
+  # Status
+  st = status
+  ss = status -sb
+
+  # Commit / Branch
+  ci  = commit
+  ca  = commit --amend
+  can = commit --amend --no-edit
+  co  = checkout
+  cob = checkout -b
+  sw  = switch
+  swc = switch -c
+  br  = branch
+  cp  = cherry-pick
+
+  # Log
+  lg = log --graph --all --decorate --abbrev-commit --date=short \
+    --pretty=format:'%C(red)%h%C(reset) %C(green)[%ad]%C(reset) %s %C(cyan)@%an%C(reset)%C(yellow)%d%C(reset)'
+  lo = log --oneline -20
+  graph = log --graph --decorate --oneline
+
+  # Diff
+  dm   = diff @{upstream}
+  dc   = diff --cached
+  d1   = diff HEAD~
+  d2   = diff HEAD~~
+  dw   = diff --word-diff
+  ds   = diff --stat
+
+  # Reset
+  r   = reset
+  r1  = reset HEAD^
+  r2  = reset HEAD^^
+  rh  = reset --hard
+  rh1 = reset HEAD^ --hard
+  rh2 = reset HEAD^^ --hard
+
+  # Stash
+  sl = stash list
+  sp = stash pop
+  ss = stash push -m
+
+  # Utility
+  p     = "!git push -u origin \"$(git symbolic-ref --short HEAD)\""
+  tags  = tag -l
+  undo  = reset --soft HEAD^
+  wip   = "!git add -A && git commit -m 'wip'"
+  cop   = "!git for-each-ref --format='%(refname:short)' | fzf --reverse | xargs git checkout"
+  clear = "!f() { \
+    target=\"${1:-$(git symbolic-ref --short HEAD)}\"; \
+    git checkout \"$target\"; \
+    git branch --merged \"$target\" \
+    | grep -vE \"^(\\*|\\s*(master|main|develop)$)\" \
+    | xargs -r git branch -d; \
+    }; f"
+
+[include]
+  path = ~/.gitconfig.local
+
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true

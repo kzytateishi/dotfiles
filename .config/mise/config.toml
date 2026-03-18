@@ -1,0 +1,7 @@
+[tools]
+node = "latest"
+go = "latest"
+ruby = "latest"
+flutter = "latest"
+python = "latest"
+pnpm = "latest"
