@@ -1,0 +1,88 @@
+add_newline = false
+
+[character]
+format = "[❯❯](bold green) "
+success_symbol = "[❯❯](bold green) "
+error_symbol = "[❯❯](bold red) "
+
+[git_commit]
+tag_symbol = " tag "
+
+[git_status]
+disabled = true
+
+[aws]
+symbol = "aws "
+format = '\[[$symbol($profile)(\($region\))(\[$duration\])]($style)\]'
+
+[dart]
+symbol = "dart "
+format = '\[[$symbol($version)]($style)\]'
+
+[directory]
+format = "[$path]($style)[$read_only]($read_only_style) "
+truncation_length = 4
+truncate_to_repo = false
+truncation_symbol = "…/"
+
+[docker_context]
+format = '\[[$symbol$context]($style)\]'
+
+[elixir]
+symbol = "exs "
+format = '\[[$symbol($version \(OTP $otp_version\))]($style)\]'
+
+[git_branch]
+style = "fg:white bg:black"
+
+[golang]
+symbol = "go "
+format = '\[[$symbol($version)]($style)\]'
+
+[hg_branch]
+symbol = "hg "
+format = '\[[$symbol$branch]($style)\]'
+
+[java]
+symbol = "java "
+format = '\[[$symbol($version)]($style)\]'
+
+[kotlin]
+symbol = "kt "
+format = '\[[$symbol($version)]($style)\]'
+
+[nodejs]
+style = "bold fg:#5E5E5E"
+symbol = "[⬢](bold green) "
+format = '\[[$symbol($version)]($style)\]'
+
+[package]
+disabled = true
+
+[php]
+symbol = "php "
+format = '\[[$symbol($version)]($style)\]'
+
+[python]
+symbol = "py "
+format = '\[[${symbol}${pyenv_prefix}(${version})(\($virtualenv\))]($style)\]'
+
+[ruby]
+symbol = "ruby "
+format = '\[[$symbol($version)]($style)\]'
+
+[rust]
+symbol = "rust "
+format = '\[[$symbol($version)]($style)\]'
+
+[scala]
+symbol = "scala "
+format = '\[[$symbol($version)]($style)\]'
+
+[swift]
+symbol = "swift "
+format = '\[[$symbol($version)]($style)\]'
+
+[terraform]
+symbol = "terraform "
+format = '\[[$symbol$workspace]($style)\]'

@@ -1,0 +1,124 @@
+# ========================================
+# テーマ設定
+# ========================================
+
+theme = Material Design Colors
+
+# ========================================
+# フォント設定
+# ========================================
+
+font-family = HackGenNerd
+font-size = 14
+font-thicken = true
+adjust-cell-height = 4
+
+# ========================================
+# ウィンドウ設定
+# ========================================
+
+# 起動時に最大化
+maximize = true
+
+# 背景透過・ブラー
+background-opacity = 0.85
+background-blur-radius = 40
+
+# パディング（読みやすさ向上）
+window-padding-x = 12
+window-padding-y = 8
+window-padding-balance = true
+window-padding-color = extend
+
+# ウィンドウ状態を保存
+window-save-state = always
+
+# 作業ディレクトリを継承
+window-inherit-working-directory = true
+
+# 新規タブの位置
+window-new-tab-position = current
+
+# macOS: タイトルバースタイル
+macos-titlebar-style = tabs
+
+# カーソル設定
+cursor-style = bar
+cursor-style-blink = false
+cursor-color = #c3e88d
+
+# ウィンドウ装飾
+window-theme = ghostty
+unfocused-split-opacity = 0.85
+
+# ========================================
+# Quick Terminal設定
+# ========================================
+
+quick-terminal-position = right
+quick-terminal-screen = main
+quick-terminal-animation-duration = 0.3
+
+# ========================================
+# クリップボード設定
+# ========================================
+
+clipboard-write = allow
+clipboard-trim-trailing-spaces = true
+
+# ========================================
+# パフォーマンス設定
+# ========================================
+
+# スクロールバック行数（大量出力に対応）
+scrollback-limit = 100000
+
+# マウス関連
+mouse-hide-while-typing = true
+mouse-scroll-multiplier = 2
+
+# ========================================
+# シェル統合
+# ========================================
+
+shell-integration = detect
+shell-integration-features = cursor,sudo,title
+
+# ========================================
+# キーバインド (tmuxスタイル: prefix = ctrl+a)
+# ========================================
+
+# 設定リロード (prefix + r)
+keybind = ctrl+a>r=reload_config
+
+# スプリット操作 (prefix + | / -)
+keybind = ctrl+a>shift+backslash=new_split:right
+keybind = ctrl+a>minus=new_split:down
+
+# スプリット閉じる (prefix + x)
+keybind = ctrl+a>x=close_surface
+
+# スプリット間移動 (prefix + h/j/k/l)
+keybind = ctrl+a>h=goto_split:left
+keybind = ctrl+a>j=goto_split:bottom
+keybind = ctrl+a>k=goto_split:top
+keybind = ctrl+a>l=goto_split:right
+
+# スプリットリサイズ (prefix + H/J/K/L)
+keybind = ctrl+a>shift+h=resize_split:left,50
+keybind = ctrl+a>shift+j=resize_split:down,50
+keybind = ctrl+a>shift+k=resize_split:up,50
+keybind = ctrl+a>shift+l=resize_split:right,50
+
+# スプリットズーム (prefix + z / tmux互換)
+keybind = ctrl+a>z=toggle_split_zoom
+
+# スプリット均等化 (prefix + e / tmux synchronize的)
+keybind = ctrl+a>e=equalize_splits
+
+# プロンプト間ジャンプ
+keybind = cmd+up=jump_to_prompt:-1
+keybind = cmd+down=jump_to_prompt:1
+
+# Quick Terminal
+keybind = cmd+shift+t=toggle_quick_terminal
