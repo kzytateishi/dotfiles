@@ -1,0 +1,17 @@
+#!/bin/bash
+# gpr [<PR 番号>]
+# PR を Graphite のレビュー画面で開く。番号を省略すると現在のブランチの PR。
+
+repo="$(gh repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null)" || {
+  echo "gpr: GitHub のリポジトリではありません" >&2
+  exit 1
+}
+if [ -n "$1" ]; then
+  num="$1"
+else
+  num="$(gh pr view --json number --jq .number 2>/dev/null)" || {
+    echo "gpr: 現在のブランチに PR がありません (番号を指定してください)" >&2
+    exit 1
+  }
+fi
+open "https://app.graphite.com/github/pr/${repo}/${num}"

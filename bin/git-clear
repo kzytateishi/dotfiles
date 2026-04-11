@@ -1,0 +1,30 @@
+#!/bin/bash
+# git clear [<branch>]
+# <branch> (省略時は default branch) に移動して fetch -p し、
+# マージ済みのローカルブランチと origin に無いローカルブランチを 1 本ずつ確認して消す。
+# main / master / develop と <branch> 自体は対象外。
+#
+# NOTE: 以前は実行時にいたブランチを skip していたが、
+# 先に <branch> へ checkout しているので skip は不要であり、
+# 「マージ済みの作業ブランチを消す」という本来の目的が達成できていなかった。
+
+target="${1:-$(git default-branch)}"
+git checkout "$target" && git fetch -p || exit 1
+
+for branch in $(git for-each-ref --format='%(refname:short)' refs/heads/); do
+  case "$branch" in
+    "$target"|main|master|develop) continue ;;
+  esac
+  if git merge-base --is-ancestor "$branch" "$target"; then
+    printf 'Delete (merged): %s? [y/N] ' "$branch"
+    read -r ans
+    [ "$ans" = "y" ] && git branch -d "$branch"
+  elif ! git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+    printf 'Delete (not on origin): %s? [y/N] ' "$branch"
+    read -r ans
+    [ "$ans" = "y" ] && git branch -D "$branch"
+  fi
+done
+
+# 最後の確認に N と答えたときに exit 1 にならないようにする
+exit 0
