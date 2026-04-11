@@ -1,0 +1,111 @@
+version: "3"
+
+vars:
+  DOTFILES_DIR:
+    sh: cd "$(dirname '{{.TASKFILE}}')"; pwd
+  # source と target が同じリンク ($HOME からの相対パス)
+  LINKS: >-
+    .gemrc
+    .gitconfig
+    .gitignore
+    .railsrc
+    .tigrc
+    .tmux.conf
+    .tmux.zsh
+    .zshenv
+    .zshrc
+    .config/karabiner/karabiner.json
+    .config/mise/config.toml
+    .config/starship.toml
+    .config/nvim/init.lua
+    .config/nvim/lua
+    .config/ghostty/config
+    .config/cmux/config
+    .config/atuin/config.toml
+  # source != target のマッピング (source:target)
+  SPECIAL_LINKS: >-
+    hooks/cmux-notify.sh:.claude/hooks/cmux-notify.sh
+  # 作成が必要なディレクトリ
+  DIRS: >-
+    .config/mise
+    .config/nvim
+    .config/karabiner
+    .config/ghostty
+    .config/cmux
+    .config/atuin
+    .claude/hooks
+
+silent: true
+
+tasks:
+  default:
+    desc: install のエイリアス
+    cmds:
+      - task: install
+
+  install:
+    desc: ディレクトリ作成 + シンボリックリンク作成
+    cmds:
+      - echo "==> Creating directories"
+      - for: { var: DIRS }
+        cmd: mkdir -p "$HOME/{{.ITEM}}"
+      - echo "==> Creating symlinks"
+      - for: { var: LINKS }
+        cmd: |
+          echo "  {{.DOTFILES_DIR}}/{{.ITEM}} => $HOME/{{.ITEM}}"
+          ln -snf "{{.DOTFILES_DIR}}/{{.ITEM}}" "$HOME/{{.ITEM}}"
+      - for: { var: SPECIAL_LINKS }
+        cmd: |
+          src="{{.DOTFILES_DIR}}/$(echo '{{.ITEM}}' | cut -d: -f1)"
+          dst="$HOME/$(echo '{{.ITEM}}' | cut -d: -f2)"
+          echo "  $src => $dst"
+          ln -snf "$src" "$dst"
+      - echo "Done!"
+
+  uninstall:
+    desc: このリポジトリを指すシンボリックリンクのみ削除
+    cmds:
+      - echo "==> Removing symlinks"
+      - for: { var: LINKS }
+        cmd: |
+          target="$HOME/{{.ITEM}}"
+          if [ -L "$target" ] && [ "$(readlink "$target")" = "{{.DOTFILES_DIR}}/{{.ITEM}}" ]; then
+            rm "$target"
+            echo "  removed $target"
+          fi
+      - for: { var: SPECIAL_LINKS }
+        cmd: |
+          src="{{.DOTFILES_DIR}}/$(echo '{{.ITEM}}' | cut -d: -f1)"
+          dst="$HOME/$(echo '{{.ITEM}}' | cut -d: -f2)"
+          if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+            rm "$dst"
+            echo "  removed $dst"
+          fi
+      - echo "Done!"
+
+  status:
+    desc: 各シンボリックリンクの状態を表示
+    cmds:
+      - for: { var: LINKS }
+        cmd: |
+          target="$HOME/{{.ITEM}}"
+          expected="{{.DOTFILES_DIR}}/{{.ITEM}}"
+          if [ -L "$target" ] && [ "$(readlink "$target")" = "$expected" ]; then
+            echo "  ✓ {{.ITEM}}"
+          elif [ -L "$target" ] || [ -e "$target" ]; then
+            echo "  ! {{.ITEM}} (別ファイルを指しています)"
+          else
+            echo "  ✗ {{.ITEM}}"
+          fi
+      - for: { var: SPECIAL_LINKS }
+        cmd: |
+          src="{{.DOTFILES_DIR}}/$(echo '{{.ITEM}}' | cut -d: -f1)"
+          dst_rel="$(echo '{{.ITEM}}' | cut -d: -f2)"
+          dst="$HOME/$dst_rel"
+          if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+            echo "  ✓ $dst_rel"
+          elif [ -L "$dst" ] || [ -e "$dst" ]; then
+            echo "  ! $dst_rel (別ファイルを指しています)"
+          else
+            echo "  ✗ $dst_rel"
+          fi
