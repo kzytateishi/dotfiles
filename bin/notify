@@ -1,0 +1,42 @@
+#!/bin/bash
+# notify                 macOS の通知を出す (`長いコマンド; notify` のように後ろに付ける)
+# notify <command...>    コマンドを実行し、終了コードと所要時間を通知する。終了コードはそのまま返す
+# 通知の出し方は claude/hooks/notify.sh と同じ (terminal-notifier、無ければ osascript)。
+
+project="$(basename "$PWD")"
+status=0
+
+if [ $# -eq 0 ]; then
+  body="完了しました"
+  sound="Glass"
+else
+  start=$SECONDS
+  "$@"
+  status=$?
+  elapsed=$((SECONDS - start))
+  if [ "$status" -eq 0 ]; then
+    body="✓ $* (${elapsed}s)"
+    sound="Glass"
+  else
+    body="✗ exit $status: $* (${elapsed}s)"
+    sound="Basso"
+  fi
+fi
+
+if command -v terminal-notifier >/dev/null 2>&1; then
+  terminal-notifier \
+    -title "Terminal" \
+    -subtitle "$project" \
+    -message "$body" \
+    -sound "$sound" \
+    -activate com.googlecode.iterm2 >/dev/null
+else
+  # $body はコマンドライン由来なので AppleScript の文字列に埋め込まず argv 経由で渡す
+  osascript - "$project" "$body" "$sound" <<'APPLESCRIPT' 2>/dev/null
+on run argv
+  display notification (item 2 of argv) with title "Terminal" subtitle (item 1 of argv) sound name (item 3 of argv)
+end run
+APPLESCRIPT
+fi
+
+exit "$status"

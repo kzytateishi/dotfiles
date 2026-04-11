@@ -1,0 +1,19 @@
+#!/bin/bash
+# adbshot [<出力先.png>]
+# 接続中の Android 端末 (エミュレータ含む) のスクショを撮ってクリップボードにも入れる。
+# 出力先の既定は ~/Desktop/adbshot-<日時>.png。複数台つないでいるときは ANDROID_SERIAL で選ぶ。
+
+out="${1:-$HOME/Desktop/adbshot-$(date +%Y%m%d-%H%M%S).png}"
+if ! adb exec-out screencap -p >"$out" || [ ! -s "$out" ]; then
+  rm -f "$out"
+  echo "adbshot: スクショを取得できませんでした (adb devices を確認)" >&2
+  exit 1
+fi
+
+# パスは AppleScript に埋め込まず argv で渡す
+osascript - "$out" <<'APPLESCRIPT'
+on run argv
+  set the clipboard to (read (POSIX file (item 1 of argv)) as «class PNGf»)
+end run
+APPLESCRIPT
+echo "$out (copied to clipboard)"

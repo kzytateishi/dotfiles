@@ -1,0 +1,13 @@
+# Codex の設定のうち、自分で決めるものだけを置く。
+# ~/.codex/config.toml はアプリ (Codex / ChatGPT) が書き換え、プロジェクトのパスも入るのでリンクしない。
+# `task codex-config` で、ここに書いたキーとテーブルだけを ~/.codex/config.toml に上書きする。
+# 値は 1 行で書く (複数行の配列やインラインでない表は merge-config.py が扱わない)。
+
+model = "gpt-6-astra"
+model_reasoning_effort = "medium"
+
+# ライブラリのドキュメント参照 (Claude 側の context7 プラグインと揃える)。初回はブラウザで OAuth
+# 名前を context7 にしない: プロジェクト設定 (例: styler の .codex/config.toml) が同名の stdio 版を持つと、
+# ユーザー設定と重ねて読まれて command と url が同居し、Codex が起動しなくなる。
+[mcp_servers.context7_http]
+url = "https://mcp.context7.com/mcp"

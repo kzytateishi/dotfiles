@@ -1,0 +1,29 @@
+#!/bin/bash
+# with-api-keys <コマンド> [引数...]
+# Keychain の API キー (keychain-set で登録したもの) を環境変数に入れてからコマンドを起動する。
+# 対話 zsh を通らない起動経路 (tmux の new-session など) で claude 等にキーを渡すのに使う。
+# 対話 zsh では .zshrc の load-api-keys が同じキーを遅延で読み込む。
+#   with-api-keys --names   読み込むキーの名前を 1 行ずつ出す (load-api-keys が使う)
+
+# 読み込むキーの一覧はここだけに書く
+KEYS=(GEMINI_API_KEY XAI_API_KEY NOTION_TOKEN)
+
+if [ "${1:-}" = --names ]; then
+  printf '%s\n' "${KEYS[@]}"
+  exit 0
+fi
+
+if [ $# -eq 0 ]; then
+  echo "usage: with-api-keys <command> [args...]" >&2
+  exit 2
+fi
+
+for k in "${KEYS[@]}"; do
+  # 既に入っていれば Keychain を引かない
+  [ -n "${!k:-}" ] && continue
+  if val="$(security find-generic-password -s "$k" -a "$USER" -w 2>/dev/null)"; then
+    export "$k=$val"
+  fi
+done
+
+exec "$@"
