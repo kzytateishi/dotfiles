@@ -1,0 +1,176 @@
+[core]
+  editor = nvim
+  precomposeunicode = true
+  quotepath = false
+  excludesfile = ~/.gitignore_global
+  # diff / log / show を delta で表示する (構文ハイライト + 行番号)
+  pager = delta
+  # 大きいリポジトリで git status を速くする (fsmonitor はリポジトリごとに常駐 daemon を起動する)
+  fsmonitor = true
+  untrackedCache = true
+
+[color]
+  ui = auto
+
+[branch]
+  # git branch を最近コミットした順に並べる
+  sort = -committerdate
+
+[column]
+  ui = auto
+  status = never
+
+[commit]
+  # コミットメッセージ編集時に diff も表示する
+  verbose = true
+
+[credential]
+  # トークンは設定ファイルではなく Keychain に保存する
+  helper = osxkeychain
+
+[help]
+  autocorrect = prompt
+
+[init]
+  defaultBranch = main
+
+[diff]
+  renames = true
+  colorMoved = default
+  algorithm = histogram
+  # a/ b/ の代わりに i/ (index) w/ (worktree) c/ (commit) で比較元を示す
+  mnemonicPrefix = true
+
+[interactive]
+  # git add -p などの対話 diff も delta で表示する (--color-only でないとパッチが壊れる)
+  diffFilter = delta --color-only
+
+[delta]
+  # n / N で次・前のファイルに飛ぶ
+  navigate = true
+  line-numbers = true
+  # side-by-side は幅を食うので常用しない。必要なときは git -c delta.side-by-side=true diff
+
+[merge]
+  conflictstyle = zdiff3
+  ff = false
+  directoryRenames = conflict
+
+[pull]
+  rebase = true
+
+[push]
+  default = current
+  autoSetupRemote = true
+  # annotated tag を push 時に一緒に送る
+  followTags = true
+
+[fetch]
+  prune = true
+  # pruneTags は付けない。lazygit の自動 fetch や gt sync のたびに push していない
+  # ローカルタグが消えるため。タグも掃除したいときは git fp を使う。
+
+[rebase]
+  autostash = true
+  autosquash = true
+  # 積み重ねたブランチの ref も rebase に追従させる
+  updateRefs = true
+
+[rerere]
+  enabled = true
+
+[transfer]
+  # 壊れたオブジェクトを fetch / push 時に検出する
+  # (古いリポジトリで fetch が失敗したら、そのリポジトリだけ fetch.fsckObjects = false にする)
+  fsckObjects = true
+
+[tag]
+  sort = -version:refname
+
+[alias]
+  # Status
+  st = status
+  ss = status -sb
+
+  # Commit / Branch
+  ci = commit
+  ca = commit --amend
+  can = commit --amend --no-edit
+  co = checkout
+  cob = checkout -b
+  sw = switch
+  swc = switch -c
+  br = branch
+  bvv = branch -vv
+  cp = cherry-pick
+  cur = rev-parse --abbrev-ref HEAD
+  up = rev-parse --abbrev-ref --symbolic-full-name @{u}
+
+  # Log
+  lg = log --graph --all --decorate --abbrev-commit --date=short --pretty=format:'%C(red)%h%C(reset) %C(green)[%ad]%C(reset) %s %C(cyan)@%an%C(reset)%C(yellow)%d%C(reset)'
+  lo = log --oneline -20
+  graph = log --graph --decorate --oneline
+  last = log -1 --stat
+  show1 = show --stat --oneline HEAD
+
+  # Diff
+  dm = diff @{upstream}
+  dc = diff --cached
+  d1 = diff HEAD~
+  d2 = diff HEAD~~
+  dw = diff --word-diff
+  ds = diff --stat
+  name = diff --name-only
+  cname = diff --cached --name-only
+
+  # Reset / Restore
+  r = reset
+  r1 = reset HEAD^
+  r2 = reset HEAD^^
+  rh = reset --hard
+  rh1 = reset HEAD^ --hard
+  rh2 = reset HEAD^^ --hard
+  rs = restore
+  rss = restore --staged
+
+  # Stash
+  sl = stash list
+  sp = stash pop
+  stm = stash push -m
+
+  # Push / Fetch
+  p = push
+  pf = push --force-with-lease
+  fp = fetch --prune --prune-tags
+
+  # Utility
+  tags = tag -l
+  undo = reset --soft HEAD^
+  wip = "!git add -A && git commit -m 'wip'"
+  fixup = commit --fixup
+  squash = commit --squash
+  # main 決め打ちだと master リポジトリで "fatal: malformed object name" になるため
+  # origin/HEAD から既定ブランチを解決する (取れなければ HEAD にフォールバック)
+  # origin/HEAD → ローカルの main/master → 現在の HEAD の順に解決する。
+  # パイプの終了ステータスは sed のものになるので `|| echo` では代替できない。
+  default-branch = "!b=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||'); if [ -z \"$b\" ]; then for c in main master; do if git show-ref -q --verify \"refs/heads/$c\"; then b=\"$c\"; break; fi; done; fi; [ -n \"$b\" ] || b=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); printf '%s\\n' \"$b\""
+  merged = "!git branch --merged \"$(git default-branch)\""
+  unmerged = "!git branch --no-merged \"$(git default-branch)\""
+  cop = "!git for-each-ref --format='%(refname:short)' refs/heads | fzf --reverse | xargs -r git switch"
+
+  # git clear は長くなったので bin/git-clear に移した (git が PATH 上の git-* をサブコマンドとして呼ぶ)
+
+[include]
+  path = ~/.gitconfig.local
+
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential

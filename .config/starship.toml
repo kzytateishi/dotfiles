@@ -1,0 +1,164 @@
+# Catppuccin Mocha (nvim / tmux と揃える)。アイコンは Nerd Font 前提。
+# グリフは TOML の \uXXXX エスケープで書く (私用領域の文字は直書きすると環境によって欠ける)。
+#   \uE0B6 / \uE0B4 : pill の左右の丸 (tmux のステータスバーと同じ)
+# pill の地はどれも surface0 にして、色は文字側に付ける (明るい地に暗い文字は眩しく読みにくい)
+#
+# 1 行目: [user@host] [ディレクトリ] [git ブランチ] 言語バージョン 実行時間
+# 2 行目: ❯❯
+format = """
+$username$hostname$directory$git_branch$git_commit$git_state\
+$nodejs$ruby$python$golang$rust$java$kotlin$scala$swift$php$dart$elixir\
+$docker_context$aws$terraform$cmd_duration$jobs
+$character"""
+add_newline = false
+palette = "catppuccin_mocha"
+
+[palettes.catppuccin_mocha]
+crust = "#11111b"
+mantle = "#181825"
+base = "#1e1e2e"
+surface0 = "#313244"
+surface1 = "#45475a"
+overlay0 = "#6c7086"
+subtext0 = "#a6adc8"
+text = "#cdd6f4"
+red = "#f38ba8"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+blue = "#89b4fa"
+lavender = "#b4befe"
+mauve = "#cba6f7"
+
+[character]
+# format にグリフを直書きすると $symbol が使われず error_symbol が死ぬ
+# (コマンドが失敗してもプロンプトが赤くならない)
+success_symbol = "[❯❯](bold green)"
+error_symbol = "[❯❯](bold red)"
+vimcmd_symbol = "[❮❮](bold mauve)"
+
+# SSH 先でだけ出る (starship の既定)
+[username]
+style_user = "bold peach"
+style_root = "bold red"
+format = "[$user]($style)"
+
+[hostname]
+style = "bold peach"
+format = "[@$hostname]($style) "
+
+[directory]
+style = "bold fg:blue bg:surface0"
+read_only = " \U000F033E"
+read_only_style = "fg:red bg:surface0"
+format = "[\uE0B6](fg:surface0)[ $path]($style)[$read_only]($read_only_style)[ ](bg:surface0)[\uE0B4](fg:surface0) "
+truncation_length = 4
+truncate_to_repo = false
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = "\uF418 "
+style = "fg:mauve bg:surface0"
+format = "[\uE0B6](fg:surface0)[ $symbol$branch ]($style)[\uE0B4](fg:surface0) "
+
+[git_commit]
+tag_symbol = " \uF412 "
+style = "bold green"
+
+[git_state]
+style = "bold peach"
+
+# 大きいリポジトリで遅くなるので無効のまま
+[git_status]
+disabled = true
+
+[cmd_duration]
+style = "yellow"
+format = "[\uF252 $duration]($style) "
+
+[jobs]
+style = "bold teal"
+
+[aws]
+symbol = "\uE7AD "
+style = "peach"
+format = "[$symbol($profile)(\\($region\\))(\\[$duration\\])]($style) "
+
+[docker_context]
+symbol = "\uF308 "
+style = "blue"
+format = "[$symbol$context]($style) "
+
+[terraform]
+symbol = "\U000F1062 "
+style = "mauve"
+format = "[$symbol$workspace]($style) "
+
+[nodejs]
+symbol = "\uE718 "
+style = "green"
+format = "[$symbol($version)]($style) "
+
+[ruby]
+symbol = "\uE791 "
+style = "red"
+format = "[$symbol($version)]($style) "
+
+[python]
+symbol = "\uE73C "
+style = "yellow"
+format = "[${symbol}${pyenv_prefix}(${version})(\\($virtualenv\\))]($style) "
+
+[golang]
+symbol = "\uE627 "
+style = "sky"
+format = "[$symbol($version)]($style) "
+
+[rust]
+symbol = "\uE7A8 "
+style = "peach"
+format = "[$symbol($version)]($style) "
+
+[java]
+symbol = "\uE738 "
+style = "red"
+format = "[$symbol($version)]($style) "
+
+[kotlin]
+symbol = "\uE634 "
+style = "mauve"
+format = "[$symbol($version)]($style) "
+
+[scala]
+symbol = "\uE737 "
+style = "red"
+format = "[$symbol($version)]($style) "
+
+[swift]
+symbol = "\uE755 "
+style = "peach"
+format = "[$symbol($version)]($style) "
+
+[php]
+symbol = "\uE73D "
+style = "lavender"
+format = "[$symbol($version)]($style) "
+
+[dart]
+symbol = "\uE798 "
+style = "blue"
+format = "[$symbol($version)]($style) "
+
+[elixir]
+symbol = "\uE62D "
+style = "mauve"
+format = "[$symbol($version \\(OTP $otp_version\\))]($style) "
+
+[hg_branch]
+symbol = "\uF418 "
+format = "[$symbol$branch]($style) "
+
+[package]
+disabled = true

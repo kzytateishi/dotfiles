@@ -1,0 +1,15 @@
+#!/bin/bash
+# simshot [<出力先.png>]
+# 起動中の iOS シミュレータのスクショを撮ってクリップボードにも入れる。
+# 出力先の既定は ~/Desktop/simshot-<日時>.png。シミュレータが複数起動中なら最初の 1 台。
+
+out="${1:-$HOME/Desktop/simshot-$(date +%Y%m%d-%H%M%S).png}"
+xcrun simctl io booted screenshot "$out" >/dev/null || exit 1
+
+# パスは AppleScript に埋め込まず argv で渡す
+osascript - "$out" <<'APPLESCRIPT'
+on run argv
+  set the clipboard to (read (POSIX file (item 1 of argv)) as «class PNGf»)
+end run
+APPLESCRIPT
+echo "$out (copied to clipboard)"
