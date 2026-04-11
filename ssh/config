@@ -1,0 +1,59 @@
+# ~/.ssh/config から Include される (task install が "Include ~/<dotfiles>/ssh/config" の 1 行を書く)
+#
+# このファイルには鍵名やホスト名など個人・会社に固有の情報を書かない。
+# ホストごとの IdentityFile / HostName / User は ~/.ssh/config.local に書く (git 管理外)。
+# ssh は「最初に見つかった値」を採用するので、config.local を先に読ませて上書き可能にしている。
+Include ~/.ssh/config.local
+
+# GitHub
+# 鍵は config.local 側で指定する:
+#   Host github.com
+#     IdentityFile ~/.ssh/<鍵ファイル名>
+# 会社用など複数アカウントを分けるときは config.local に別名ホストを作る:
+#   Host github-work
+#     HostName github.com
+#     User git
+#     IdentityFile ~/.ssh/<会社用の鍵>
+#     IdentitiesOnly yes
+#   (clone は git@github-work:org/repo.git と書く)
+# github-* の別名ホストにも共通で効かせる (別名は github-<名前> で付ける)
+Host github.com github-*
+  User git
+  IdentitiesOnly yes
+  # 接続先が同じ github.com でも、別名ホストごとにソケットを分ける。
+  # 共通設定の %C はホスト名・ユーザー・ポートのハッシュなので別名でも同じ値になり、
+  # 先に認証した別アカウントの接続を再利用してしまう。%n (指定した名前) なら別になる。
+  ControlPath ~/.cache/ssh/sockets/%n
+
+Host *
+  # macOS 専用キーワードを Linux でも無視できるようにする (UseKeychain より前に置く必要がある)
+  IgnoreUnknown UseKeychain
+  # 鍵のパスフレーズを Keychain に保存し、初回利用時に ssh-agent へ自動登録する
+  AddKeysToAgent yes
+  UseKeychain yes
+  # agent に載っている鍵を総当たりせず、IdentityFile で指定した鍵だけを使う
+  # (Too many authentication failures の予防)
+  IdentitiesOnly yes
+
+  # 無通信で切断されるのを防ぐ (60 秒ごとに keepalive、3 回応答なしで切る)
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+  # 同じホストへの接続を 10 分間再利用して 2 回目以降を高速化する (git push/pull が速くなる)
+  # ソケット置き場は task install が作る。~/.ssh をクラウド同期している環境でも
+  # ソケットが同期対象にならないよう、~/.ssh の外 (~/.cache) に置く。
+  # %C はユーザー・ホスト・ポートのハッシュ。UNIX ソケットはパス長の上限が 104 文字で、
+  # ssh は作成時にランダムな接尾辞 17 文字を足すため、長いホスト名をそのまま使うと失敗する。
+  # ポートフォワードや踏み台で副作用が出たホストは、config.local 側で ControlMaster no にして外す。
+  ControlMaster auto
+  ControlPath ~/.cache/ssh/sockets/%C
+  ControlPersist 10m
+
+  # 初めてのホストは自動で known_hosts に追加し、鍵が変わったときだけ警告する
+  # (no にすると中間者攻撃に気づけなくなるので使わない)
+  StrictHostKeyChecking accept-new
+  # サーバー側で鍵がローテーションされたら known_hosts を自動更新する
+  UpdateHostKeys yes
+
+  # ForwardAgent は Host * に書かない。接続先が侵害されると自分の鍵が使われるため、
+  # 必要なホストだけ config.local で個別に有効化する。

@@ -1,0 +1,15 @@
+#!/bin/bash
+# keychain-set <名前>
+# Keychain に汎用パスワード (サービス名 <名前>、アカウント $USER) を登録・上書きする。
+# 値は必ず対話入力にする。コマンドラインに書くとシェル履歴と atuin に平文で残るため、
+# 値を引数で受け取る経路はあえて作らない。
+# .zshrc の load-api-keys が読む GEMINI_API_KEY などの登録に使う。
+
+if [ $# -ne 1 ]; then
+  echo "usage: keychain-set <name>" >&2
+  exit 2
+fi
+
+# -U: 既にあれば上書き。-w は最後に置き、値を渡さないことで対話入力になる
+security add-generic-password -U -s "$1" -a "$USER" -w &&
+  echo "keychain-set: $1 を登録しました"

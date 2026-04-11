@@ -1,0 +1,17 @@
+# このリポジトリ自身の除外設定
+# (全リポジトリ共通の除外は gitignore_global に書く)
+**/.DS_Store
+
+# Karabiner-Elements が ~/.config/karabiner (= このリポジトリ) に自動生成する
+.config/karabiner/automatic_backups/
+
+# インストーラ/設定変更ツールが作る自動バックアップ
+*.bak
+*.bak.*
+*.bak-*
+
+# Neovim が状態ディレクトリに書けないとき (サンドボックス内など) にカレントへ書くログ
+nvim.log
+
+# python3 で codex/merge-config.py を検査・実行したときのバイトコード
+__pycache__/

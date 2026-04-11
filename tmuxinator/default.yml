@@ -1,0 +1,30 @@
+# <%= path %>
+# tmuxinator new <name> で生成されるテンプレート (dotfiles の tmuxinator/default.yml)。
+# 生成後に root と server / console のコマンドをプロジェクトに合わせて書き換える。
+name: <%= name %>
+root: ~/workspace/<%= name %>
+
+on_project_start:
+  - "git fetch --prune || true"
+
+on_project_restart:
+  - "git fetch --prune || true"
+
+windows:
+  - editor:
+      layout: main-horizontal
+      panes:
+        - claude
+        - "git status --short --branch; exec ${SHELL:-zsh} -l"
+
+  # - server:
+  #     - task up
+  #
+  # - console:
+  #     - "task api:console; exec ${SHELL:-zsh} -l"
+  #
+  # 別リポジトリをウィンドウにする場合は root を上書きする
+  # - app:
+  #     root: ../<%= name %>_app
+  #     panes:
+  #       - "git status --short --branch; exec ${SHELL:-zsh} -l"

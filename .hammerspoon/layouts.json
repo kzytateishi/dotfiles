@@ -1,0 +1,214 @@
+{
+  "Built-in Retina Display #1 + Studio Display (1) #1 + Studio Display (2) #1" : [
+    {
+      "app" : "com.google.Chrome",
+      "screen" : "Studio Display (2) #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 0.5,
+        "x" : 0.5,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.google.Chrome",
+      "screen" : "Studio Display (2) #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 0.5,
+        "x" : 0,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.google.Chrome",
+      "screen" : "Studio Display (2) #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 0.5,
+        "x" : 0.5,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.google.Chrome",
+      "screen" : "Studio Display (2) #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 0.5,
+        "x" : 0.5,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.1password.1password",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0.13569999999999999,
+        "w" : 0.49809999999999999,
+        "x" : 0.37990000000000002,
+        "h" : 0.62019999999999997
+      }
+    },
+    {
+      "app" : "com.google.Chrome",
+      "screen" : "Studio Display (2) #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 0.5,
+        "x" : 0.49969999999999998,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.google.Chrome",
+      "screen" : "Studio Display (2) #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 0.5,
+        "x" : 0.49969999999999998,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.googlecode.iterm2",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 1,
+        "x" : 0,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.tinyspeck.slackmacgap",
+      "screen" : "Studio Display (1) #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 0.5,
+        "x" : 0.49969999999999998,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "notion.id",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 1,
+        "x" : 0,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.linear",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 1,
+        "x" : 0,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.openai.codex",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 0.99809999999999999,
+        "x" : 0,
+        "h" : 0.99770000000000003
+      }
+    },
+    {
+      "app" : "com.todesktop.230313mzl4w4u92",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 1,
+        "x" : 0,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.electron.realtimeboard",
+      "screen" : "Studio Display (1) #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 0.5,
+        "x" : 0,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.figma.Desktop",
+      "screen" : "Studio Display (1) #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 0.50190000000000001,
+        "x" : 0.0019,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.apple.dt.Devices",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0.35659999999999997,
+        "w" : 0.53400000000000003,
+        "x" : 0.44890000000000002,
+        "h" : 0.62019999999999997
+      }
+    },
+    {
+      "app" : "com.personal-os.ui.app",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 1,
+        "x" : 0,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "md.obsidian",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 1,
+        "x" : 0,
+        "h" : 1
+      }
+    },
+    {
+      "app" : "com.electron.dockerdesktop",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0.082199999999999995,
+        "w" : 0.61670000000000003,
+        "x" : 0.15809999999999999,
+        "h" : 0.55740000000000001
+      }
+    },
+    {
+      "app" : "com.apple.finder",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0.36670000000000003,
+        "w" : 0.44750000000000001,
+        "x" : 0.5161,
+        "h" : 0.38140000000000002
+      }
+    },
+    {
+      "app" : "com.anthropic.claudefordesktop",
+      "screen" : "Built-in Retina Display #1",
+      "rect" : {
+        "y" : 0,
+        "w" : 1,
+        "x" : 0,
+        "h" : 1
+      }
+    }
+  ]
+}

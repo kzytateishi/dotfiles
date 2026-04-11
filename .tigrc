@@ -1,0 +1,18 @@
+# id / 相対日時 / 著者 (短縮) / グラフ付きタイトル
+set main-view = id date:relative-compact author:abbreviated,width=12 commit-title:graph=v2,refs=yes
+set split-view-height = 80%
+set vertical-split = no
+set diff-context = 6
+
+set line-graphics = utf-8
+
+# git の contrib にある diff-highlight で行内の変更箇所を強調する (PATH に通してある)
+set diff-highlight = true
+
+# tmux と同じくマウスで選択・スクロールできるようにする
+set mouse = true
+# 検索は小文字だけなら大文字小文字を区別しない
+set ignore-case = smart-case
+
+# Y: 選択中のコミットのハッシュをクリップボードへコピー (y は既定で stash 表示)
+bind generic Y @sh -c "printf '%s' %(commit) | pbcopy"

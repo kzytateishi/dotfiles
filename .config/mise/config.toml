@@ -1,0 +1,20 @@
+# グローバルの既定バージョン。
+# Node/Go/Ruby/Python/pnpm は latest、Flutter は 3.44 系を使う。
+# 再現性が必要なプロジェクトでは各 repo の mise.toml / .tool-versions に
+# バージョンを固定する。ここは「素の shell での既定」。
+#
+# 更新するとき:
+#   mise ls-remote <tool>          # 候補を見る
+#   mise use -g <tool>@<version>   # このファイルが書き換わる
+[tools]
+node = "latest"
+go = "latest"
+ruby = "latest"
+python = "latest"
+pnpm = "latest"
+flutter = "3.44"
+
+[settings]
+# .ruby-version / .nvmrc / .python-version は既定では読まれない。
+# これが無いと Rails などのリポジトリでもグローバルの latest が使われてしまう。
+idiomatic_version_file_enable_tools = ["ruby", "node", "python"]
