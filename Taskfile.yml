@@ -1,0 +1,201 @@
+version: "3"
+
+vars:
+  DOTFILES_DIR:
+    sh: cd "$(dirname '{{.TASKFILE}}')"; pwd
+  # source と target が同じリンク ($HOME からの相対パス)
+  LINKS: >-
+    .gemrc
+    .gitconfig
+    .railsrc
+    .tigrc
+    .tmux.conf
+    .tmux.zsh
+    .zshenv
+    .zshrc
+    .zsh_snippets.zsh
+    .config/karabiner
+    .config/mise/config.toml
+    .config/starship.toml
+    .config/nvim/init.lua
+    .config/nvim/lua
+    .config/nvim/lazy-lock.json
+    .config/atuin/config.toml
+  # source != target のマッピング (source:target)
+  SPECIAL_LINKS: >-
+    gitignore_global:.gitignore_global
+    claude/settings.json:.claude/settings.json
+    claude/CLAUDE.md:.claude/CLAUDE.md
+    claude/statusline.sh:.claude/statusline.sh
+    claude/hooks/notify.sh:.claude/hooks/notify.sh
+    claude/hooks/audit-config-change.sh:.claude/hooks/audit-config-change.sh
+    claude/skills/deep-review:.claude/skills/deep-review
+    claude/skills/codex:.claude/skills/codex
+    claude/skills/gemini:.claude/skills/gemini
+    claude/skills/dept-research:.claude/skills/dept-research
+    claude/skills/dept-writing:.claude/skills/dept-writing
+    claude/skills/dept-legal:.claude/skills/dept-legal
+    claude/skills/dept-secretary:.claude/skills/dept-secretary
+    claude/skills/dept-ai:.claude/skills/dept-ai
+    orca/agent-hooks:.orca/agent-hooks
+  # install が使う共通のリンク関数。各 cmd は別シェルで動くので毎回定義する。
+  LINK_FN: |
+    link() {
+      src="$1"; dst="$2"
+      if [ ! -e "$src" ]; then
+        echo "  skip (source missing): $src"
+        return 0
+      fi
+      if [ -L "$dst" ]; then
+        if [ "$(readlink "$dst")" = "$src" ]; then
+          echo "  = $dst"
+          return 0
+        fi
+        rm -f "$dst"
+      elif [ -e "$dst" ]; then
+        backup="$dst.bak-$(date +%Y%m%d%H%M%S)"
+        mv "$dst" "$backup"
+        echo "  ! 既存の実体を退避: $backup"
+      fi
+      mkdir -p "$(dirname "$dst")"
+      ln -sn "$src" "$dst"
+      echo "  $src => $dst"
+    }
+
+  # 作成が必要なディレクトリ
+  DIRS: >-
+    .config/mise
+    .config/nvim
+    .config/atuin
+    .claude/hooks
+    .claude/skills
+
+silent: true
+
+tasks:
+  default:
+    desc: install のエイリアス
+    cmds:
+      - task: install
+
+  install:
+    desc: ディレクトリ作成 + シンボリックリンク作成
+    cmds:
+      - echo "==> Creating directories"
+      - for: { var: DIRS }
+        cmd: mkdir -p "$HOME/{{.ITEM}}"
+      - echo "==> Creating symlinks"
+      # 既存の実体を必ず退避してからリンクする。ln -snf をそのまま使うと
+      #   - 実ファイル (gh auth setup-git が作る ~/.gitconfig 等) を無警告で破壊する
+      #   - 実ディレクトリ (Karabiner が作る ~/.config/karabiner 等) の "中" に
+      #     リンクを作ってしまい、本来の設定がリンクされないまま Done! と出る
+      # どちらも exit 0 なので気づけない。
+      - for: { var: LINKS }
+        cmd: |
+          {{.LINK_FN}}
+          link "{{.DOTFILES_DIR}}/{{.ITEM}}" "$HOME/{{.ITEM}}"
+      - for: { var: SPECIAL_LINKS }
+        cmd: |
+          {{.LINK_FN}}
+          link "{{.DOTFILES_DIR}}/$(echo '{{.ITEM}}' | cut -d: -f1)" \
+               "$HOME/$(echo '{{.ITEM}}' | cut -d: -f2)"
+      - echo "Done!"
+
+  uninstall:
+    desc: このリポジトリを指すシンボリックリンクのみ削除
+    cmds:
+      - echo "==> Removing symlinks"
+      - for: { var: LINKS }
+        cmd: |
+          target="$HOME/{{.ITEM}}"
+          if [ -L "$target" ] && [ "$(readlink "$target")" = "{{.DOTFILES_DIR}}/{{.ITEM}}" ]; then
+            rm "$target"
+            echo "  removed $target"
+          fi
+      - for: { var: SPECIAL_LINKS }
+        cmd: |
+          src="{{.DOTFILES_DIR}}/$(echo '{{.ITEM}}' | cut -d: -f1)"
+          dst="$HOME/$(echo '{{.ITEM}}' | cut -d: -f2)"
+          if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+            rm "$dst"
+            echo "  removed $dst"
+          fi
+      - echo "Done!"
+
+  status:
+    desc: 各シンボリックリンクの状態を表示
+    cmds:
+      - for: { var: LINKS }
+        cmd: |
+          target="$HOME/{{.ITEM}}"
+          expected="{{.DOTFILES_DIR}}/{{.ITEM}}"
+          # -e も見る。readlink の一致だけでは、リポジトリ側のファイルを
+          # 消した/改名した後の dangling symlink を ✓ と誤報告する。
+          if [ -L "$target" ] && [ "$(readlink "$target")" = "$expected" ] && [ -e "$target" ]; then
+            echo "  ✓ {{.ITEM}}"
+          elif [ -L "$target" ] && [ "$(readlink "$target")" = "$expected" ]; then
+            echo "  ! {{.ITEM}} (リンク先が存在しません)"
+          elif [ -L "$target" ] || [ -e "$target" ]; then
+            echo "  ! {{.ITEM}} (別ファイルを指しています)"
+          else
+            echo "  ✗ {{.ITEM}}"
+          fi
+      - for: { var: SPECIAL_LINKS }
+        cmd: |
+          src="{{.DOTFILES_DIR}}/$(echo '{{.ITEM}}' | cut -d: -f1)"
+          dst_rel="$(echo '{{.ITEM}}' | cut -d: -f2)"
+          dst="$HOME/$dst_rel"
+          if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ] && [ -e "$dst" ]; then
+            echo "  ✓ $dst_rel"
+          elif [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+            echo "  ! $dst_rel (リンク先が存在しません)"
+          elif [ -L "$dst" ] || [ -e "$dst" ]; then
+            echo "  ! $dst_rel (別ファイルを指しています)"
+          else
+            echo "  ✗ $dst_rel"
+          fi
+
+  doctor:
+    desc: 依存コマンドと外部管理の前提条件をチェック
+    cmds:
+      - |
+        echo "==> Required"
+        for c in git nvim tmux zsh fzf jq; do
+          command -v "$c" >/dev/null 2>&1 && echo "  ✓ $c" || echo "  ✗ $c (必須)"
+        done
+        echo "==> Optional (無くても動くが機能が減る)"
+        for c in eza bat procs dust rg fd atuin zoxide direnv mise starship \
+                 lazygit tig task gh tmuxinator terminal-notifier; do
+          command -v "$c" >/dev/null 2>&1 && echo "  ✓ $c" || echo "  - $c"
+        done
+        echo "==> External state (このリポジトリの管理外)"
+        # .tmux.conf 側と同じ -x で判定する。-d だとクローン中断や +x 欠落を
+        # 見逃し、tmux がプラグインを一切読まない状態を ✓ と報告してしまう。
+        [ -x "$HOME/.tmux/plugins/tpm/tpm" ] \
+          && echo "  ✓ tpm" \
+          || echo "  ✗ tpm (git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm)"
+        [ -d "$HOME/.local/share/zinit/zinit.git" ] \
+          && echo "  ✓ zinit" || echo "  - zinit (初回 zsh 起動時に自動導入)"
+        [ -e "$HOME/.tmuxinator" ] \
+          && echo "  ✓ ~/.tmuxinator ($(readlink "$HOME/.tmuxinator" || echo 実体))" \
+          || echo "  - ~/.tmuxinator (tmuxx のセッション選択に必要)"
+        # ファイルの有無ではなく user.email が実際に解決するかを見る
+        # (include 先を辿らせるため --includes を付ける)
+        if [ -n "$(git config --global --includes --get user.email 2>/dev/null)" ]; then
+          echo "  ✓ user.name/email (~/.gitconfig.local)"
+        else
+          echo "  ✗ user.email が未設定 → ~/.gitconfig.local に書くこと"
+        fi
+        echo "==> Git"
+        if [ "$(git config --global core.excludesfile)" = "$HOME/.gitignore_global" ]; then
+          echo "  ✓ core.excludesfile"
+        else
+          echo "  ✗ core.excludesfile が ~/.gitignore_global を指していない"
+        fi
+        # --global は include 先 (~/.gitconfig.local) を辿らないので付けない
+        if git config --get-regexp '^url\..*\.insteadof' >/dev/null 2>&1; then
+          echo "  ! url.insteadOf ルールあり — URL にトークンが埋まっていないか確認すること:"
+          git config --show-origin --get-regexp '^url\..*\.insteadof' \
+            | sed -E 's#(gh[pousr]_|github_pat_)[A-Za-z0-9_]+#\1***REDACTED***#g' \
+            | sed 's/^/      /'
+        fi

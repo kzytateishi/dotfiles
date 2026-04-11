@@ -1,0 +1,10 @@
+# このリポジトリ自身の除外設定
+# (全リポジトリ共通の除外は gitignore_global に書く)
+**/.DS_Store
+
+# Karabiner-Elements が ~/.config/karabiner (= このリポジトリ) に自動生成する
+.config/karabiner/automatic_backups/
+
+# インストーラ/設定変更ツールが作る自動バックアップ
+*.bak
+*.bak.*

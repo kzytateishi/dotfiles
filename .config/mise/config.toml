@@ -1,0 +1,15 @@
+# グローバルの既定バージョン。
+# "latest" だとマシン間・時期で解決結果がずれて再現性が無くなるため、
+# メジャー(必要ならマイナー)で固定する。プロジェクト側は各 repo の
+# mise.toml / .tool-versions が優先されるので、ここは「素の shell での既定」。
+#
+# 更新するとき:
+#   mise ls-remote <tool>          # 候補を見る
+#   mise use -g <tool>@<version>   # このファイルが書き換わる
+[tools]
+node = "latest"
+go = "latest"
+ruby = "latest"
+python = "latest"
+pnpm = "latest"
+flutter = "3.44"

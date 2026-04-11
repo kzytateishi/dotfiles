@@ -1,0 +1,43 @@
+# Global gitignore (core.excludesfile 経由で全リポジトリに適用される)
+# リポジトリ固有の除外はこのファイルではなく各 repo の .gitignore に書くこと
+
+### macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+# NOTE: "Icon?" は書かない。macOS は core.ignorecase=true なので icons/ Icons/ に
+# マッチして、アイコンディレクトリごと無視されてしまう
+# (本来の対象は Finder が作る "Icon\r" という古い形式のファイル)
+
+### Editor / IDE
+*.swp
+*.swo
+*~
+.netrwhist
+.idea/
+*.iml
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.nvim.lua
+Session.vim
+
+### Direnv / local env
+.envrc.local
+
+### Tooling caches that no repo should track
+.ruby-lsp/
+# Playwright MCP がブラウザ操作のたびに吐くコンソールログとページスナップショット
+.playwright-mcp/
+# NOTE: 素の "tags" は書かない。ディレクトリにもマッチするため Rails の
+# app/views/tags/ などが丸ごと無視される。ctags のファイルは
+# プロジェクト側の .gitignore か .git/info/exclude で除外する。
+# .solargraph.yml も意図的にコミットするリポジトリがあるため global では扱わない。
+tags.lock
+tags.temp
+
+**/.claude/.cc-writes/
