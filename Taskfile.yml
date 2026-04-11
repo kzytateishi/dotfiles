@@ -1,0 +1,443 @@
+version: "3"
+
+vars:
+  DOTFILES_DIR:
+    sh: cd "$(dirname '{{.TASKFILE}}')"; pwd
+  # source と target が同じリンク ($HOME からの相対パス)
+  LINKS: >-
+    .gemrc
+    .gitconfig
+    .railsrc
+    .tigrc
+    .tmux.conf
+    .tmux.zsh
+    .zshenv
+    .zshrc
+    .zsh_snippets.zsh
+    .config/karabiner
+    .config/mise/config.toml
+    .config/starship.toml
+    .config/nvim/init.lua
+    .config/nvim/lua
+    .config/nvim/lazy-lock.json
+    .config/atuin/config.toml
+    bin
+  # bin は ~/bin にディレクトリごとリンクする (PATH は .zshrc で通している)。
+  # マシン固有のスクリプトはリポジトリに入れず ~/.local/bin に置く (こちらも PATH 済み)。
+  # source != target のマッピング (source:target)
+  # (この下の >- の中に # を書くとコメントにならずリンク対象として読まれるので、注記はここに書く)
+  # claude/CLAUDE.md は Codex のグローバル指示 (~/.codex/AGENTS.md) にも使う。作業ルールは共通のため。
+  # ~/.codex/config.toml は Codex / ChatGPT アプリが書き換え、プロジェクトのパスも入るのでリンクしない (task codex-config で一部だけ反映)。
+  # 個人用スキルは Codex も同じ SKILL.md 形式で読むので ~/.codex/skills にも張る。
+  # codex スキル (Codex に聞く) は Codex 側では意味がないので、代わりに codex/skills/claude (Claude に聞く) を張る。
+  SPECIAL_LINKS: >-
+    gitignore_global:.gitignore_global
+    claude/settings.json:.claude/settings.json
+    claude/CLAUDE.md:.claude/CLAUDE.md
+    claude/CLAUDE.md:.codex/AGENTS.md
+    claude/statusline.sh:.claude/statusline.sh
+    claude/hooks/notify.sh:.claude/hooks/notify.sh
+    claude/hooks/audit-config-change.sh:.claude/hooks/audit-config-change.sh
+    claude/skills/deep-review:.claude/skills/deep-review
+    claude/skills/codex:.claude/skills/codex
+    claude/skills/gemini:.claude/skills/gemini
+    claude/skills/dept-research:.claude/skills/dept-research
+    claude/skills/dept-writing:.claude/skills/dept-writing
+    claude/skills/dept-legal:.claude/skills/dept-legal
+    claude/skills/dept-secretary:.claude/skills/dept-secretary
+    claude/skills/dept-ai:.claude/skills/dept-ai
+    claude/skills/dept-research:.codex/skills/dept-research
+    claude/skills/dept-writing:.codex/skills/dept-writing
+    claude/skills/dept-legal:.codex/skills/dept-legal
+    claude/skills/dept-secretary:.codex/skills/dept-secretary
+    claude/skills/dept-ai:.codex/skills/dept-ai
+    claude/skills/gemini:.codex/skills/gemini
+    codex/skills/claude:.codex/skills/claude
+    tmuxinator/default.yml:.tmuxinator/default.yml
+    orca/agent-hooks:.orca/agent-hooks
+  # ~/.ssh/config はリンクせず、ssh/config を Include する 1 行だけのファイルにする。
+  # ~/.ssh を複数マシンで同期していると絶対パスのリンクも同期され、ホームのパスが違うマシンで切れる
+  # (ssh は ~/.ssh/config が無くても黙って無視するので、Host の定義が効かなくなるだけで気づきにくい)。
+  # ~ は ssh がマシンごとに展開するので、ホーム配下にクローンしていればどのマシンでも同じ内容で動く。
+  SSH_CONFIG_STUB:
+    sh: d="$(cd "$(dirname '{{.TASKFILE}}')"; pwd)"; case "$d" in "$HOME"/*) d="~${d#"$HOME"}";; esac; echo "Include $d/ssh/config"
+  # install が使う共通のリンク関数。各 cmd は別シェルで動くので毎回定義する。
+  LINK_FN: |
+    link() {
+      src="$1"; dst="$2"
+      if [ ! -e "$src" ]; then
+        echo "  error (source missing): $src" >&2
+        return 1
+      fi
+      if [ -L "$dst" ]; then
+        if [ "$(readlink "$dst")" = "$src" ]; then
+          echo "  = $dst"
+          return 0
+        fi
+        rm -f "$dst" || return 1
+      elif [ -e "$dst" ]; then
+        backup="$dst.bak-$(date +%Y%m%d%H%M%S)"
+        while [ -e "$backup" ] || [ -L "$backup" ]; do
+          backup="$backup.1"
+        done
+        mv "$dst" "$backup" || return 1
+        echo "  ! Backed up existing file: $backup"
+      fi
+      mkdir -p "$(dirname "$dst")" || return 1
+      ln -sn "$src" "$dst" || return 1
+      echo "  $src => $dst"
+    }
+
+  # 作成が必要なディレクトリ
+  DIRS: >-
+    .config/mise
+    .config/nvim
+    .config/atuin
+    .claude/hooks
+    .claude/skills
+    .ssh
+    .cache/ssh/sockets
+
+silent: true
+
+tasks:
+  default:
+    desc: Alias for install
+    cmds:
+      - task: install
+
+  install:
+    desc: Create directories and symlinks
+    cmds:
+      - echo "==> Creating directories"
+      - for: { var: DIRS }
+        cmd: mkdir -p "$HOME/{{.ITEM}}"
+      # ssh は ~/.ssh が他人から読めると設定を拒否する (Bad owner or permissions)。
+      # ソケット置き場も他ユーザーから接続されないよう 700 にする。
+      - chmod 700 "$HOME/.ssh" "$HOME/.cache/ssh/sockets"
+      - echo "==> Creating symlinks"
+      # 既存の実体を必ず退避してからリンクする。ln -snf をそのまま使うと
+      #   - 実ファイル (gh auth setup-git が作る ~/.gitconfig 等) を無警告で破壊する
+      #   - 実ディレクトリ (Karabiner が作る ~/.config/karabiner 等) の "中" に
+      #     リンクを作ってしまい、本来の設定がリンクされないまま Done! と出る
+      # どちらも exit 0 なので気づけない。
+      - for: { var: LINKS }
+        cmd: |
+          {{.LINK_FN}}
+          link "{{.DOTFILES_DIR}}/{{.ITEM}}" "$HOME/{{.ITEM}}"
+      - for: { var: SPECIAL_LINKS }
+        cmd: |
+          {{.LINK_FN}}
+          link "{{.DOTFILES_DIR}}/$(echo '{{.ITEM}}' | cut -d: -f1)" \
+               "$HOME/$(echo '{{.ITEM}}' | cut -d: -f2)"
+      # 旧方式のリンクはそのまま置き換え、内容の違う実体は link と同じく退避してから書く
+      - |
+        dst="$HOME/.ssh/config"
+        stub='{{.SSH_CONFIG_STUB}}'
+        if [ ! -L "$dst" ] && [ -f "$dst" ] && [ "$(cat "$dst")" = "$stub" ]; then
+          echo "  = $dst"
+          exit 0
+        fi
+        if [ -L "$dst" ]; then
+          rm -f "$dst" || exit 1
+        elif [ -e "$dst" ]; then
+          backup="$dst.bak-$(date +%Y%m%d%H%M%S)"
+          while [ -e "$backup" ] || [ -L "$backup" ]; do
+            backup="$backup.1"
+          done
+          mv "$dst" "$backup" || exit 1
+          echo "  ! Backed up existing file: $backup"
+        fi
+        printf '%s\n' "$stub" > "$dst" && chmod 600 "$dst" || exit 1
+        echo "  $stub => $dst"
+      # Karabiner はリンク先のディレクトリを監視しているので、dotfiles を消して clone し直すと
+      # 監視が切れてデフォルト設定のまま戻らない (ログに Load が出ず、ルールもデバイス設定も効かない)。
+      # 再起動して読み直させる。Karabiner が無いマシンでは何もしない。
+      - |
+        svc="gui/$(id -u)/org.pqrs.service.agent.Karabiner-Console-User-Server"
+        if launchctl print "$svc" >/dev/null 2>&1; then
+          launchctl kickstart -k "$svc" && echo "  ↻ Reloaded Karabiner configuration" || echo "  ! Failed to restart Karabiner (quit it from the menu bar and relaunch)"
+        fi
+      - echo "Done!"
+
+  uninstall:
+    desc: Remove only symlinks pointing into this repository
+    cmds:
+      - echo "==> Removing symlinks"
+      - for: { var: LINKS }
+        cmd: |
+          target="$HOME/{{.ITEM}}"
+          if [ -L "$target" ] && [ "$(readlink "$target")" = "{{.DOTFILES_DIR}}/{{.ITEM}}" ]; then
+            rm "$target"
+            echo "  removed $target"
+          fi
+      - for: { var: SPECIAL_LINKS }
+        cmd: |
+          src="{{.DOTFILES_DIR}}/$(echo '{{.ITEM}}' | cut -d: -f1)"
+          dst="$HOME/$(echo '{{.ITEM}}' | cut -d: -f2)"
+          if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+            rm "$dst"
+            echo "  removed $dst"
+          fi
+      # ~/.ssh を同期していると他のマシンからも消えるので注意
+      - |
+        dst="$HOME/.ssh/config"
+        if [ ! -L "$dst" ] && [ -f "$dst" ] && [ "$(cat "$dst")" = '{{.SSH_CONFIG_STUB}}' ]; then
+          rm "$dst"
+          echo "  removed $dst"
+        fi
+      - echo "Done!"
+
+  status:
+    desc: Show the status of each symlink
+    cmds:
+      - for: { var: LINKS }
+        cmd: |
+          target="$HOME/{{.ITEM}}"
+          expected="{{.DOTFILES_DIR}}/{{.ITEM}}"
+          # -e も見る。readlink の一致だけでは、リポジトリ側のファイルを
+          # 消した/改名した後の dangling symlink を ✓ と誤報告する。
+          if [ -L "$target" ] && [ "$(readlink "$target")" = "$expected" ] && [ -e "$target" ]; then
+            echo "  ✓ {{.ITEM}}"
+          elif [ -L "$target" ] && [ "$(readlink "$target")" = "$expected" ]; then
+            echo "  ! {{.ITEM}} (link target does not exist)"
+          elif [ -L "$target" ] || [ -e "$target" ]; then
+            echo "  ! {{.ITEM}} (points to a different file)"
+          else
+            echo "  ✗ {{.ITEM}}"
+          fi
+      - for: { var: SPECIAL_LINKS }
+        cmd: |
+          src="{{.DOTFILES_DIR}}/$(echo '{{.ITEM}}' | cut -d: -f1)"
+          dst_rel="$(echo '{{.ITEM}}' | cut -d: -f2)"
+          dst="$HOME/$dst_rel"
+          if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ] && [ -e "$dst" ]; then
+            echo "  ✓ $dst_rel"
+          elif [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+            echo "  ! $dst_rel (link target does not exist)"
+          elif [ -L "$dst" ] || [ -e "$dst" ]; then
+            echo "  ! $dst_rel (points to a different file)"
+          else
+            echo "  ✗ $dst_rel"
+          fi
+      - |
+        dst="$HOME/.ssh/config"
+        if [ ! -L "$dst" ] && [ -f "$dst" ] && [ "$(cat "$dst")" = '{{.SSH_CONFIG_STUB}}' ]; then
+          echo "  ✓ .ssh/config ({{.SSH_CONFIG_STUB}})"
+        elif [ -L "$dst" ] || [ -e "$dst" ]; then
+          echo "  ! .ssh/config (content is not '{{.SSH_CONFIG_STUB}}' → task install)"
+        else
+          echo "  ✗ .ssh/config"
+        fi
+
+  lint:
+    desc: Syntax-check shell scripts, zsh, plist, JSON, ssh config and tmuxinator definitions
+    cmds:
+      - |
+        fail=0
+        echo "==> shellcheck"
+        # SC1090: 実行時に決まるパスを source している (orca hooks)。追跡できないだけなので除外する
+        if command -v shellcheck >/dev/null 2>&1; then
+          shellcheck -S warning -e SC1090 claude/hooks/*.sh claude/statusline.sh orca/agent-hooks/*.sh bin/* && echo "  ✓ shellcheck" || fail=1
+        else
+          echo "  - shellcheck not installed (brew install shellcheck)"
+        fi
+        echo "==> zsh -n"
+        for f in .zshrc .zshenv .tmux.zsh .zsh_snippets.zsh; do
+          zsh -n "$f" && echo "  ✓ $f" || fail=1
+        done
+        echo "==> plist"
+        for f in com.googlecode.iterm2.plist iterm2/colors/*.itermcolors; do
+          plutil -lint "$f" >/dev/null && echo "  ✓ $f" || { echo "  ✗ $f"; fail=1; }
+        done
+        echo "==> JSON"
+        for f in claude/settings.json .config/karabiner/karabiner.json .config/nvim/lazy-lock.json; do
+          jq empty "$f" && echo "  ✓ $f" || fail=1
+        done
+        echo "==> ssh config"
+        ssh -F ssh/config -G github.com >/dev/null 2>&1 </dev/null && echo "  ✓ ssh/config" || fail=1
+        echo "==> tmuxinator"
+        if command -v tmuxinator >/dev/null 2>&1; then
+          for f in "$HOME"/.tmuxinator/*.yml; do
+            [ -e "$f" ] || continue
+            p="$(basename "$f" .yml)"
+            [ "$p" = default ] && continue
+            tmuxinator debug "$p" >/dev/null 2>&1 && echo "  ✓ $p" || { echo "  ✗ $p"; fail=1; }
+          done
+        fi
+        if [ "$fail" -eq 0 ]; then echo "All good."; else echo "lint failed"; exit 1; fi
+
+  codex-config:
+    desc: Apply codex/config.toml (settings managed here) to ~/.codex/config.toml
+    # ~/.codex/config.toml はアプリが書き換えるのでリンクせず、管理するキーとテーブルだけを上書きする。
+    # 管理外の設定が変わる場合や反映に失敗した場合は書き込まない (merge-config.py が検証する)。
+    cmds:
+      - |
+        if [ ! -f "$HOME/.codex/config.toml" ]; then
+          echo "  ✗ ~/.codex/config.toml not found → launch Codex once first"
+          exit 1
+        fi
+        python3 -I "{{.DOTFILES_DIR}}/codex/merge-config.py" "{{.DOTFILES_DIR}}/codex/config.toml" "$HOME/.codex/config.toml"
+        echo "  (for context7, authenticate in the browser the first time with: codex mcp login context7)"
+
+  clean:
+    desc: Delete regenerable dev caches (Xcode, simulators, mise, uv, Homebrew, pnpm, npm, go, Docker build cache, Gradle)
+    # どれも次に必要になったときに再取得・再生成されるものだけを消す。
+    # 対象は毎回その時点の状態から判定する (特定のパスや ID は書かない)。
+    prompt: Delete regenerable dev caches? (running simulators and Gradle daemons will be stopped)
+    cmds:
+      - |
+        df -h / | awk 'NR==2 { print "==> Free before: " $4 }'
+      - |
+        echo "==> Xcode"
+        dev="$HOME/Library/Developer"
+        if [ -d "$dev/Xcode/DerivedData" ]; then
+          rm -rf "$dev/Xcode/DerivedData/"* && echo "  ✓ DerivedData"
+        fi
+        # iOS DeviceSupport は実機の OS バージョンごとに数 GB 作られる。機種ごとに最新だけ残す
+        ds="$dev/Xcode/iOS DeviceSupport"
+        if [ -d "$ds" ]; then
+          for model in $(ls "$ds" | awk '{ print $1 }' | sort -u); do
+            ls -dt "$ds/$model "* | tail -n +2 | while IFS= read -r d; do
+              rm -rf "$d" && echo "  ✓ removed $(basename "$d")"
+            done
+          done
+        fi
+      - |
+        echo "==> Simulators"
+        if command -v xcrun >/dev/null 2>&1 && [ -d "$HOME/Library/Developer/CoreSimulator/Devices" ]; then
+          # 起動中のシミュレータが無いと失敗を返す。task は失敗したコマンドで打ち切るので || true
+          xcrun simctl shutdown all 2>/dev/null || true
+          xcrun simctl delete unavailable && echo "  ✓ deleted unavailable simulators"
+          # XCUITest の添付 (録画・スクリーンショット) は testmanagerd の領域に溜まり続け、1 台で 100GB 近くになる
+          find "$HOME/Library/Developer/CoreSimulator/Devices" -type d -path '*/InternalDaemon/*/Attachments' 2>/dev/null \
+            | while IFS= read -r d; do
+                find "$d" -mindepth 1 -delete && echo "  ✓ test attachments in $(echo "$d" | sed 's|.*/Devices/\([^/]*\)/.*|\1|')"
+              done
+        fi
+      - |
+        echo "==> mise"
+        if command -v mise >/dev/null 2>&1; then
+          mise prune -y && echo "  ✓ mise prune"
+          # flutter などの http バックエンドは展開先 (http-tarballs) が prune の対象外なので、
+          # installs/ からリンクされていないものを消す
+          tb="$HOME/.local/share/mise/http-tarballs"
+          if [ -d "$tb" ]; then
+            used="$(find "$HOME/.local/share/mise/installs" -maxdepth 2 -type l -exec readlink {} \; 2>/dev/null)"
+            for d in "$tb"/*; do
+              [ -d "$d" ] || continue
+              printf '%s\n' "$used" | grep -qF "$d" || { rm -rf "$d" && echo "  ✓ removed unused $(basename "$d")"; }
+            done
+          fi
+        fi
+      - |
+        echo "==> Package caches"
+        # 1 つ失敗しても残りは続ける (失敗は ✗ で表示する)
+        run() {
+          name="$1"; shift
+          command -v "$1" >/dev/null 2>&1 || return 0
+          if "$@"; then echo "  ✓ $name"; else echo "  ✗ $name"; fi
+        }
+        # uvx で常駐している MCP サーバーなどがキャッシュのロックを持っていると、既定では 300 秒待つ。
+        # 待たずに諦める (その uv プロセスを終了してから再実行すれば消える)
+        UV_LOCK_TIMEOUT=10 run uv uv cache prune
+        run brew brew cleanup --prune=all
+        run pnpm pnpm store prune
+        run npm npm cache clean --force
+        run go go clean -cache -modcache
+        # Docker のビルドキャッシュ。イメージ・ボリューム (DB データなど) には触らない。
+        # Docker Desktop が起動していないときは飛ばす
+        if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+          run "docker build cache" docker builder prune -af
+        fi
+        if [ -d "$HOME/.gradle/caches" ]; then
+          # 動いている daemon がキャッシュを掴んでいると壊れるので先に止める。
+          # daemon が無いと pkill は失敗を返し、task はそこで打ち切るので || true
+          pkill -f GradleDaemon 2>/dev/null || true
+          if rm -rf "$HOME/.gradle/caches"; then echo "  ✓ gradle"; else echo "  ✗ gradle"; fi
+        fi
+      - |
+        df -h / | awk 'NR==2 { print "==> Free after: " $4 }'
+
+  doctor:
+    desc: Check required commands and externally managed prerequisites
+    cmds:
+      - |
+        echo "==> Required"
+        for c in git nvim tmux zsh fzf jq; do
+          command -v "$c" >/dev/null 2>&1 && echo "  ✓ $c" || echo "  ✗ $c (required)"
+        done
+        echo "==> Optional (works without them, with fewer features)"
+        for c in eza bat procs dust rg fd atuin zoxide direnv mise starship \
+                 lazygit tig task gh tmuxinator terminal-notifier \
+                 delta ast-grep yazi glow hyperfine gt; do
+          command -v "$c" >/dev/null 2>&1 && echo "  ✓ $c" || echo "  - $c"
+        done
+        echo "==> External state (not managed by this repository)"
+        # .tmux.conf 側と同じ -x で判定する。-d だとクローン中断や +x 欠落を
+        # 見逃し、tmux がプラグインを一切読まない状態を ✓ と報告してしまう。
+        [ -x "$HOME/.tmux/plugins/tpm/tpm" ] \
+          && echo "  ✓ tpm" \
+          || echo "  ✗ tpm (git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm)"
+        [ -f "$HOME/.local/share/zinit/zinit.git/zinit.zsh" ] \
+          && echo "  ✓ zinit" || echo "  - zinit (installed automatically on first zsh launch)"
+        [ -e "$HOME/.tmuxinator" ] \
+          && echo "  ✓ ~/.tmuxinator ($(readlink "$HOME/.tmuxinator" || echo "not a symlink"))" \
+          || echo "  - ~/.tmuxinator (required for tmuxx session selection)"
+        # 各プロジェクト定義の健全性。root が無いものは消し忘れ、name とファイル名の不一致は
+        # tmuxx の起動済み判定 (セッション名 = name) がずれる原因になる。
+        for f in "$HOME"/.tmuxinator/*.yml; do
+          [ -e "$f" ] || continue
+          proj="$(basename "$f" .yml)"
+          # default.yml は tmuxinator new のテンプレート (ERB 入り) なのでプロジェクトとして見ない
+          [ "$proj" = default ] && continue
+          name="$(sed -n 's/^name:[[:space:]]*//p' "$f" | head -1 | tr -d "\"'")"
+          root="$(sed -n 's/^root:[[:space:]]*//p' "$f" | head -1 | tr -d "\"'")"
+          case "$root" in "~"*) root="$HOME${root#\~}";; esac
+          if [ -n "$root" ] && [ ! -d "$root" ]; then
+            echo "  ! tmuxinator/$proj.yml: root does not exist ($root) → delete it if no longer needed"
+          elif [ -n "$name" ] && [ "$name" != "$proj" ]; then
+            echo "  ! tmuxinator/$proj.yml: name ($name) does not match the file name → make them match"
+          fi
+        done
+        # ファイルの有無ではなく user.email が実際に解決するかを見る
+        # (include 先を辿らせるため --includes を付ける)
+        for key in user.name user.email; do
+          if [ -n "$(git config --global --includes --get "$key" 2>/dev/null)" ]; then
+            echo "  ✓ $key (~/.gitconfig.local)"
+          else
+            echo "  ✗ $key is not set → add it to ~/.gitconfig.local"
+          fi
+        done
+        echo "==> SSH"
+        # 600/700 以外だと ssh が ~/.ssh/config を読まない。~/.ssh 自体がシンボリックリンクでも実体側の権限を見る (-L)。
+        if [ -d "$HOME/.ssh" ] && [ "$(stat -L -f %Lp "$HOME/.ssh")" = "700" ]; then
+          echo "  ✓ ~/.ssh (700)"
+        else
+          echo "  ✗ ~/.ssh permissions are not 700 → chmod 700 ~/.ssh"
+        fi
+        # ssh -G は未指定でも既定の id_* を identityfile として出すので、ファイルの有無で判定する
+        [ -f "$HOME/.ssh/config.local" ] \
+          && echo "  ✓ ~/.ssh/config.local" \
+          || echo "  - ~/.ssh/config.local (host-specific settings such as key names and HostName; not needed if you use the default ~/.ssh/id_*)"
+        echo "==> Git"
+        if [ "$(git config --global --includes --path --get core.excludesfile)" = "$HOME/.gitignore_global" ]; then
+          echo "  ✓ core.excludesfile"
+        else
+          echo "  ✗ core.excludesfile does not point to ~/.gitignore_global"
+        fi
+        # コミット署名は .gitconfig.1password を ~/.gitconfig.local から include したマシンだけで有効
+        if [ "$(git config --global --includes --bool --get commit.gpgsign 2>/dev/null)" != true ]; then
+          echo "  - Commit signing (to enable, include .gitconfig.1password from ~/.gitconfig.local)"
+        elif [ -z "$(git config --global --includes --get user.signingkey 2>/dev/null)" ]; then
+          echo "  ✗ commit.gpgsign = true but user.signingkey is not set → commits will fail"
+        elif [ ! -x "$(git config --global --includes --get gpg.ssh.program 2>/dev/null)" ]; then
+          echo "  ✗ gpg.ssh.program not found → install 1Password.app or remove the include"
+        else
+          echo "  ✓ Commit signing (1Password)"
+        fi
+        # --global は include 先 (~/.gitconfig.local) を辿らないので付けない
+        if git config --get-regexp '^url\..*\.insteadof' >/dev/null 2>&1; then
+          # URL 自体に任意形式の認証情報が入るため、値やキー名は出力しない。
+          echo "  ! url.insteadOf rules found — open your local config and check that no URL embeds credentials"
+        fi

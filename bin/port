@@ -1,0 +1,38 @@
+#!/bin/bash
+# port            LISTEN 中の TCP ポートを一覧表示
+# port <番号>     そのポートで LISTEN しているプロセスを表示
+# port -k <番号>  そのプロセスを確認のうえ終了する (SIGTERM)
+
+usage() {
+  echo "usage: port [-k] [<port>]" >&2
+  exit 2
+}
+
+kill_mode=0
+if [ "$1" = "-k" ]; then
+  kill_mode=1
+  shift
+fi
+[ $# -le 1 ] || usage
+
+if [ $# -eq 0 ]; then
+  [ "$kill_mode" -eq 0 ] || usage
+  exec lsof -nP -iTCP -sTCP:LISTEN
+fi
+
+case "$1" in
+  ''|*[!0-9]*) usage ;;
+esac
+
+if ! lsof -nP -iTCP:"$1" -sTCP:LISTEN; then
+  echo "port: $1 で LISTEN しているプロセスはありません" >&2
+  exit 1
+fi
+[ "$kill_mode" -eq 1 ] || exit 0
+
+pids="$(lsof -t -iTCP:"$1" -sTCP:LISTEN | sort -u | tr '\n' ' ')"
+printf 'Kill %s? [y/N] ' "$pids"
+read -r ans
+[ "$ans" = "y" ] || exit 0
+# shellcheck disable=SC2086 # pids は空白区切りの PID 列
+kill $pids

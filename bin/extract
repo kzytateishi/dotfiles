@@ -1,0 +1,51 @@
+#!/bin/bash
+# extract <アーカイブ>...
+# 拡張子から展開方法を選ぶ。tar / zip 系はカレントに散らばらないよう
+# アーカイブ名 (拡張子なし) のディレクトリを作ってその中に展開する。
+# .gz などの単体圧縮は元ファイルを残して隣に展開する。
+
+if [ $# -eq 0 ]; then
+  echo "usage: extract <archive>..." >&2
+  exit 2
+fi
+
+# アーカイブ名から展開先ディレクトリを作る (既にあれば失敗させて上書きを防ぐ)
+mkdest() {
+  dest="$1"
+  if [ -e "$dest" ]; then
+    echo "extract: $dest は既に存在します" >&2
+    return 1
+  fi
+  mkdir -p "$dest"
+}
+
+fail=0
+for f in "$@"; do
+  if [ ! -f "$f" ]; then
+    echo "extract: $f が見つかりません" >&2
+    fail=1
+    continue
+  fi
+  case "$f" in
+    *.tar.gz|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.txz|*.tar.zst|*.tar)
+      base="$(basename "$f")"
+      base="${base%.tar*}"; base="${base%.tgz}"; base="${base%.tbz2}"; base="${base%.txz}"
+      mkdest "$base" && tar -xf "$f" -C "$base" ;;
+    *.zip)
+      mkdest "$(basename "$f" .zip)" && unzip -q "$f" -d "$dest" ;;
+    *.7z)
+      command -v 7z >/dev/null 2>&1 || { echo "extract: 7z が必要です (brew install sevenzip)" >&2; fail=1; continue; }
+      mkdest "$(basename "$f" .7z)" && 7z x "$f" -o"$dest" >/dev/null ;;
+    *.rar)
+      command -v unar >/dev/null 2>&1 || { echo "extract: unar が必要です (brew install unar)" >&2; fail=1; continue; }
+      unar -q "$f" ;;
+    *.gz)  gunzip -k "$f" ;;
+    *.bz2) bunzip2 -k "$f" ;;
+    *.xz)  unxz -k "$f" ;;
+    *.zst) unzstd -q "$f" ;;
+    *)
+      echo "extract: $f は対応していない形式です" >&2
+      false ;;
+  esac || fail=1
+done
+exit "$fail"
