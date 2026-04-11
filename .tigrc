@@ -1,0 +1,8 @@
+set main-view = id date author commit-title:graph=yes,refs=yes
+set split-view-height = 80%
+set vertical-split = no
+set diff-context = 6
+
+set line-graphics = utf-8
+
+set diff-highlight = true
